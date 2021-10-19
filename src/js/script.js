@@ -1,3 +1,5 @@
+"use strict"
+
 var mySlider = new rSlider({
   target: '#sampleSlider',
   values: [10000, 1000000],
@@ -8,10 +10,12 @@ var mySlider = new rSlider({
   step: 10000
 });
 
-"use strict"
-
 const COUNT_OBJECT = 7; //количество обьектов
-const COUNT_PHOTOS = 4 //количество фотографий
+const COUNT_PHOTOS = 4; //количество фотографий
+const COUNT_ROOMS = 7; //количество комнат
+const MIN_COUNT_AREA = 30; 
+const MAX_COUNT_AREA = 250; 
+const BUILDING_MAX = 40; 
 const PRICE_MIN = 250000; //минимальная цена квартиры
 const PRICE_MAX = 2000000; //максимальная цена квартиры
 const PRODUCT_CATEGORY = "Недвижимость"; //максимальная цена квартиры
@@ -74,7 +78,6 @@ const photosUrlList = [
 ];
 
 const getRandomInt = (min,max) => Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min)) + Math.ceil(min));
-const getRandom = (min,max) => Math.random() * (Math.floor(max) - Math.ceil(min)) + Math.ceil(min);
 
 const getUrlPhotos = (arr) => {
   let urls = [];
@@ -97,19 +100,19 @@ const getArrayObjects = (arr) =>{
       category: PRODUCT_CATEGORY,
       seller:{
         fullname:sellerNameList[getRandomInt(0,sellerNameList.length)],
-        rating: +getRandom(0,5).toFixed(1)
+        rating: getRandomInt(0,50)/10
       },
       publishDate: Date.now(),
       address:{
         city: cityList[getRandomInt(0,cityList.length)],
         street: streetList[getRandomInt(0,streetList.length)],
-        building: getRandomInt(1,40)
+        building: getRandomInt(1,BUILDING_MAX)
       },
       photos: getUrlPhotos(photosUrlList),
       filters:{
         type: filtersTypeList[getRandomInt(0,filtersTypeList.length)],
-        area: getRandomInt(30,250),
-        roomsCount:getRandomInt(1,7)
+        area: getRandomInt(MIN_COUNT_AREA, MAX_COUNT_AREA),
+        roomsCount:getRandomInt(1,COUNT_ROOMS)
       }
     }
   }
