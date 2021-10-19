@@ -73,13 +73,14 @@ const photosUrlList = [
   "img/house_4.png"
 ];
 
-const getRandomInt = (min,max) => Math.random() * (Math.floor(max) - Math.ceil(min)) + Math.ceil(min);
+const getRandomInt = (min,max) => Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min)) + Math.ceil(min));
+const getRandom = (min,max) => Math.random() * (Math.floor(max) - Math.ceil(min)) + Math.ceil(min);
 
 const getUrlPhotos = (arr) => {
   let urls = [];
-  let count = Math.round(getRandomInt(1,COUNT_PHOTOS));
+  let count = getRandomInt(1,COUNT_PHOTOS);
   while(urls.length !== count) {
-    let rndElem = arr[Math.round(getRandomInt(0,arr.length))];
+    let rndElem = arr[getRandomInt(0,arr.length)];
     if(!urls.includes(rndElem)){
       urls.push(rndElem);
     };
@@ -90,30 +91,29 @@ const getUrlPhotos = (arr) => {
 const getArrayObjects = (arr) =>{ 
   for (let i = 0; i < COUNT_OBJECT; i++) {
     arr[i] = {
-      name: nameList[Math.floor(getRandomInt(0,nameList.length))],
-      description: descriptionList[Math.floor(getRandomInt(0,descriptionList.length))],
-      price: Math.floor(getRandomInt(PRICE_MIN,PRICE_MAX)),
+      name: nameList[getRandomInt(0,nameList.length)],
+      description: descriptionList[getRandomInt(0,descriptionList.length)],
+      price: getRandomInt(PRICE_MIN,PRICE_MAX),
       category: PRODUCT_CATEGORY,
       seller:{
-        fullname:sellerNameList[Math.floor(getRandomInt(0,sellerNameList.length))],
-        rating: +getRandomInt(0,5).toFixed(1)
+        fullname:sellerNameList[getRandomInt(0,sellerNameList.length)],
+        rating: +getRandom(0,5).toFixed(1)
       },
       publishDate: Date.now(),
       address:{
-        city: cityList[Math.floor(getRandomInt(0,cityList.length))],
-        street: streetList[Math.floor(getRandomInt(0,streetList.length))],
-        building: Math.round(getRandomInt(1,40))
+        city: cityList[getRandomInt(0,cityList.length)],
+        street: streetList[getRandomInt(0,streetList.length)],
+        building: getRandomInt(1,40)
       },
       photos: getUrlPhotos(photosUrlList),
       filters:{
-        type: filtersTypeList[Math.floor(getRandomInt(0,filtersTypeList.length))],
-        area: Math.floor(getRandomInt(30,250)),
-        roomsCount: Math.floor(getRandomInt(1,7))
+        type: filtersTypeList[getRandomInt(0,filtersTypeList.length)],
+        area: getRandomInt(30,250),
+        roomsCount:getRandomInt(1,7)
       }
     }
   }
   return arr;
 };
-
 
 console.log(getArrayObjects(arrayObject));
