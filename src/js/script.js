@@ -12,6 +12,7 @@ const RATING_MAX = 5;
 const PRICE_MIN = 250000;
 const PRICE_MAX = 2000000;
 const PRODUCT_CATEGORY = "Недвижимость";
+const CARDS_LIST = []
 
 const nameList = [
   'Двушка в центре Питера',
@@ -84,10 +85,9 @@ const getUrlPhotos = (arr) => {             //NEED REVIEW
   return urls;
 };
 
-
 const getArrayObjects = (arr) =>{
-  for (let i = 0; i < COUNT_OBJECT; i++) {
-    arr.push = {
+  for (let i = 0; i < COUNT_CARDS; i++) {
+    arr.push({
       name: nameList[getRandomInt(0,nameList.length)],
       description: descriptionList[getRandomInt(0,descriptionList.length)],
       price: getRandomInt(PRICE_MIN,PRICE_MAX),
@@ -108,11 +108,10 @@ const getArrayObjects = (arr) =>{
         area: getRandomInt(MIN_COUNT_AREA, MAX_COUNT_AREA),
         roomsCount:getRandomInt(1,COUNT_ROOMS)
       }
-    }
+    })
   }
   return arr;
 };
-
 
 var mySlider = new rSlider({
   target: '#sampleSlider',
@@ -124,4 +123,4 @@ var mySlider = new rSlider({
   step: 10000
 });
 
-console.log(getArrayObjects(arrayObject));
+console.log(getArrayObjects(CARDS_LIST));
