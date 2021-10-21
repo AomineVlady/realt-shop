@@ -12,7 +12,7 @@ const RATING_MAX = 5;
 const PRICE_MIN = 250000;
 const PRICE_MAX = 2000000;
 const PRODUCT_CATEGORY = "Недвижимость";
-const CARDS_LIST = []
+const MAX_DAYS_MILLISECONDS = 432000000;
 
 const nameList = [
   'Двушка в центре Питера',
@@ -58,7 +58,7 @@ const filtersTypeList = [
   'flat'
 ];
 
-const photosUrlList = [ //NEED REVIEW
+const photosUrlList = [
   "img/apt_1.png",
   "img/apt_2.png" ,
   "img/apt_3.png",
@@ -73,7 +73,7 @@ const photosUrlList = [ //NEED REVIEW
 
 const getRandomInt = (min,max) => Math.floor(Math.random() * (max - min) + min);
 
-const getUrlPhotos = (arr) => {             //NEED REVIEW
+const getUrlPhotos = (arr) => {           
   let urls = [];
   let count = getRandomInt(COUNT_PHOTOS_MIN,COUNT_PHOTOS_MAX);
   while(urls.length !== count) {
@@ -85,9 +85,10 @@ const getUrlPhotos = (arr) => {             //NEED REVIEW
   return urls;
 };
 
-const getArrayObjects = (arr) =>{
+const getListCards = () =>{
+  let list = [];
   for (let i = 0; i < COUNT_CARDS; i++) {
-    arr.push({
+    list.push({
       name: nameList[getRandomInt(0,nameList.length)],
       description: descriptionList[getRandomInt(0,descriptionList.length)],
       price: getRandomInt(PRICE_MIN,PRICE_MAX),
@@ -96,13 +97,14 @@ const getArrayObjects = (arr) =>{
         fullname:sellerNameList[getRandomInt(0,sellerNameList.length)],
         rating: getRandomInt(0,RATING_MAX*10)/10
       },
-      publishDate: Date.now(),
+      // publishDate: getRandomInt(Date.now()-MAX_DAYS_MILLISECONDS,Date.now()),
+      publishDate: getRandomInt(Date.now()-MAX_DAYS_MILLISECONDS,Date.now()),
       address:{
         city: cityList[getRandomInt(0,cityList.length)],
         street: streetList[getRandomInt(0,streetList.length)],
         building: getRandomInt(BUILDING_MIN,BUILDING_MAX)
       },
-      photos: getUrlPhotos(photosUrlList), //NEED REVIEW
+      photos: getUrlPhotos(photosUrlList),
       filters:{
         type: filtersTypeList[getRandomInt(0,filtersTypeList.length)],
         area: getRandomInt(MIN_COUNT_AREA, MAX_COUNT_AREA),
@@ -110,8 +112,10 @@ const getArrayObjects = (arr) =>{
       }
     })
   }
-  return arr;
+  return list;
 };
+
+const CARDS_LIST = getListCards();
 
 var mySlider = new rSlider({
   target: '#sampleSlider',
@@ -123,4 +127,95 @@ var mySlider = new rSlider({
   step: 10000
 });
 
-console.log(getArrayObjects(CARDS_LIST));
+const priceTransform = (arg) => {
+  let argString = arg.toString().split('');
+  if (argString.length>3) {
+    for (let i = argString.length-3; i >= 0; i-=3) {
+        argString[i] = ` ${argString[i]}`;
+    }
+  }
+  return argString.join('').trim();
+};
+
+const cardsWrapper = document.querySelector('.results__list');
+const cardFragment = document.createDocumentFragment();
+const popup = document.querySelector('.popup');
+const popupBtnClose = document.querySelector('.popup__close');
+const createCardFragment = (cards) =>{
+  for (const card of cards) {
+    let cardElement = document.createElement("li");
+    cardElement.className = 'results__item';
+    cardElement.classList.add('product');
+    cardElement.innerHTML = `
+      <button class="product__favourite fav-add" type="button" aria-label="Добавить в избранное">
+        <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M3 7C3 13 10 16.5 11 17C12 16.5 19 13 19 7C19 4.79086 17.2091 3 15 3C12 3 11 5 11 5C11 5 10 3 7 3C4.79086 3 3 4.79086 3 7Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="product__image">
+        <div class="product__image-more-photo hidden">+2 фото</div>
+        <img src="${card.photos[0]}" width="318" height="220" alt="${card.name}">
+      </div>
+      <div class="product__content">
+        <h3 class="product__title">
+          <a href="#">${card.name}</a>
+        </h3>
+        <div class="product__price">${priceTransform(card.price)} ₽</div>
+        <div class="product__address">${card.address.city} ${card.address.street} ${card.address.building}</div>
+        <div class="product__date">${card.publishDate}</div>
+      </div>`;
+    cardFragment.appendChild(cardElement);
+  }
+  return cardFragment;
+};
+
+const cardsTemplate = createCardFragment(CARDS_LIST);
+
+const fillCards = (cards) =>{
+  cardsWrapper.appendChild(cards);
+}
+
+fillCards(cardsTemplate);
+
+const cardsItems = document.querySelectorAll('.results__item');
+
+cardsItems.forEach(item => {
+  item.addEventListener('click', function(evt){
+    if (evt.target === item.querySelector('img') || evt.target === item.querySelector('a')){
+      evt.preventDefault();
+      openPopup();
+    }
+  })
+});
+
+const openPopup = () =>{
+  popup.classList.add('popup--active');
+  initPopupEventListener();
+}
+
+const closePopup = () =>{
+  popup.classList.remove('popup--active');
+  removePopupEventListener();
+}
+
+const popupBtnCloseClick = (evt) =>{
+  evt.preventDefault();
+  closePopup();
+}
+
+const popupPressEsc = (evt) => {
+  if (evt.key === 'Escape') {
+      evt.preventDefault()
+      closePopup();       
+  }
+}
+
+const initPopupEventListener = () =>{
+  popupBtnClose.addEventListener('click',popupBtnCloseClick);
+  document.addEventListener('keydown',popupPressEsc);
+}
+
+const removePopupEventListener = () =>{
+  popupBtnClose.removeEventListener('click',popupBtnCloseClick);
+  document.removeEventListener('keydown',popupPressEsc);
+}
