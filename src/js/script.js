@@ -130,12 +130,27 @@ var mySlider = new rSlider({
 const priceTransform = (arg) => {
   let argString = arg.toString().split('');
   if (argString.length>3) {
-    for (let i = argString.length-3; i >= 0; i-=3) {
-        argString[i] = ` ${argString[i]}`;
+    for (let i = argString.length-4; i >= 0; i-=3) {
+        argString[i] += " ";
     }
   }
-  return argString.join('').trim();
-};
+  return argString.join('');
+};//костыль?
+
+const dateTransform = (arg) =>{
+  let dateDifference = Date.now()- arg;
+  let day = 86400000;
+  if (dateDifference<=day) {
+    return "Сегодня";
+  }
+  if (dateDifference>day && dateDifference<= day*2) {
+    return "Вчера"
+  }
+  else{
+    let resultDate = new Date(arg);
+    return resultDate.toISOString().substr(0, 10);
+  }
+}//костыль?
 
 const cardsWrapper = document.querySelector('.results__list');
 const cardFragment = document.createDocumentFragment();
@@ -162,7 +177,7 @@ const createCardFragment = (cards) =>{
         </h3>
         <div class="product__price">${priceTransform(card.price)} ₽</div>
         <div class="product__address">${card.address.city} ${card.address.street} ${card.address.building}</div>
-        <div class="product__date">${card.publishDate}</div>
+        <div class="product__date">${dateTransform(card.publishDate)}</div>
       </div>`;
     cardFragment.appendChild(cardElement);
   }
