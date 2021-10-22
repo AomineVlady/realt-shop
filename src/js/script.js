@@ -85,6 +85,8 @@ const getUrlPhotos = (arr) => {
   return urls;
 };
 
+const dateNow = Date.now();
+
 const getListCards = () =>{
   let list = [];
   for (let i = 0; i < COUNT_CARDS; i++) {
@@ -97,8 +99,7 @@ const getListCards = () =>{
         fullname:sellerNameList[getRandomInt(0,sellerNameList.length)],
         rating: getRandomInt(0,RATING_MAX*10)/10
       },
-      // publishDate: getRandomInt(Date.now()-MAX_DAYS_MILLISECONDS,Date.now()),
-      publishDate: getRandomInt(Date.now()-MAX_DAYS_MILLISECONDS,Date.now()),
+      publishDate:dateNow - getRandomInt(0,MAX_DAYS_MILLISECONDS),
       address:{
         city: cityList[getRandomInt(0,cityList.length)],
         street: streetList[getRandomInt(0,streetList.length)],
@@ -135,10 +136,10 @@ const priceTransform = (arg) => {
     }
   }
   return argString.join('');
-};//костыль?
+};
 
 const dateTransform = (arg) =>{
-  let dateDifference = Date.now()- arg;
+  let dateDifference = dateNow - arg;
   let day = 86400000;
   if (dateDifference<=day) {
     return "Сегодня";
@@ -148,14 +149,13 @@ const dateTransform = (arg) =>{
   }
   else{
     let resultDate = new Date(arg);
-    return resultDate.toISOString().substr(0, 10);
+    return resultDate.toISOString().substr(0, 10);  
   }
 }//костыль?
 
 const cardsWrapper = document.querySelector('.results__list');
 const cardFragment = document.createDocumentFragment();
-const popup = document.querySelector('.popup');
-const popupBtnClose = document.querySelector('.popup__close');
+
 const createCardFragment = (cards) =>{
   for (const card of cards) {
     let cardElement = document.createElement("li");
@@ -184,24 +184,31 @@ const createCardFragment = (cards) =>{
   return cardFragment;
 };
 
-const cardsTemplate = createCardFragment(CARDS_LIST);
+const cardsListTemplate = createCardFragment(CARDS_LIST);
 
 const fillCards = (cards) =>{
   cardsWrapper.appendChild(cards);
 }
 
-fillCards(cardsTemplate);
+fillCards(cardsListTemplate);
 
-const cardsItems = document.querySelectorAll('.results__item');
+const cardsItemsList = document.querySelectorAll('.results__item');
 
-cardsItems.forEach(item => {
-  item.addEventListener('click', function(evt){
-    if (evt.target === item.querySelector('img') || evt.target === item.querySelector('a')){
-      evt.preventDefault();
-      openPopup();
-    }
-  })
-});
+const popup = document.querySelector('.popup');
+const popupBtnClose = document.querySelector('.popup__close');
+
+const addEventsCards = cardsItems =>{
+  cardsItems.forEach(item => {
+    item.addEventListener('click', function(evt){
+      if (evt.target === item.querySelector('img') || evt.target === item.querySelector('a')){
+        evt.preventDefault();
+        openPopup();
+      }
+    })
+  });
+}
+
+addEventsCards (cardsItemsList);
 
 const openPopup = () =>{
   popup.classList.add('popup--active');
