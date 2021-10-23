@@ -53,9 +53,9 @@ const streetList = [
 ];
 
 const filtersTypeList = [
-  'House',
-  'apartment',
-  'flat'
+  'Дом',
+  'Апартаменты',
+  'Квартира'
 ];
 
 const photosUrlList = [
@@ -91,6 +91,7 @@ const getListCards = () =>{
   let list = [];
   for (let i = 0; i < COUNT_CARDS; i++) {
     list.push({
+      card_id: `card_${i}`,
       name: nameList[getRandomInt(0,nameList.length)],
       description: descriptionList[getRandomInt(0,descriptionList.length)],
       price: getRandomInt(PRICE_MIN,PRICE_MAX),
@@ -99,7 +100,7 @@ const getListCards = () =>{
         fullname:sellerNameList[getRandomInt(0,sellerNameList.length)],
         rating: getRandomInt(0,RATING_MAX*10)/10
       },
-      publishDate:dateNow - getRandomInt(0,MAX_DAYS_MILLISECONDS),
+      publishDate: dateNow - (getRandomInt(0,MAX_DAYS_MILLISECONDS)),
       address:{
         city: cityList[getRandomInt(0,cityList.length)],
         street: streetList[getRandomInt(0,streetList.length)],
@@ -138,6 +139,37 @@ const priceTransform = (arg) => {
   return argString.join('');
 };
 
+const transformMonthNubmerToString = (month) =>{
+  switch (+month) {
+    case 1:
+      return 'Января';
+    case 2:
+      return 'Февраля';
+    case 3:
+      return 'Марта';
+    case 4:
+      return 'Апереля';
+    case 5:
+      return 'Мая';
+    case 6:
+      return 'Июня';
+    case 7:
+      return 'Июля';
+    case 8:
+      return 'Августа';
+    case 9:
+      return 'Сентября';
+    case 10:
+      return 'Октября';
+    case 11:
+      return 'Ноября';
+    case 12:
+      return 'Декабря';
+    default:
+      return "month"
+  }
+}
+
 const dateTransform = (arg) =>{
   let dateDifference = dateNow - arg;
   let day = 86400000;
@@ -149,18 +181,30 @@ const dateTransform = (arg) =>{
   }
   else{
     let resultDate = new Date(arg);
-    return resultDate.toISOString().substr(0, 10);  
+    return `${resultDate.getDate()} ${transformMonthNubmerToString(resultDate.getUTCMonth()+1)} ${resultDate.getFullYear()}`
   }
-}//костыль?
+}
+
 
 const cardsWrapper = document.querySelector('.results__list');
 const cardFragment = document.createDocumentFragment();
+
+const clearHTMLItem = item => {
+  item.innerHTML = "";
+}
+
+const fillHTMLTemplates = (wrapper,template) =>{
+  wrapper.appendChild(template);
+}
+
+clearHTMLItem(cardsWrapper);
 
 const createCardFragment = (cards) =>{
   for (const card of cards) {
     let cardElement = document.createElement("li");
     cardElement.className = 'results__item';
     cardElement.classList.add('product');
+    cardElement.id = card.card_id;
     cardElement.innerHTML = `
       <button class="product__favourite fav-add" type="button" aria-label="Добавить в избранное">
         <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -186,22 +230,105 @@ const createCardFragment = (cards) =>{
 
 const cardsListTemplate = createCardFragment(CARDS_LIST);
 
-const fillCards = (cards) =>{
-  cardsWrapper.appendChild(cards);
+fillHTMLTemplates(cardsWrapper,cardsListTemplate);
+
+const cardsItemsList = cardsWrapper.querySelectorAll('.results__item');
+
+const getCardData = (list,id) =>{
+  for (let item of list) {
+    if (item.card_id === id) {
+      return item; 
+    }
+  }
 }
 
-fillCards(cardsListTemplate);
+const popupFragment = document.createDocumentFragment();
 
-const cardsItemsList = document.querySelectorAll('.results__item');
+const createPopupContentFragment = (data) =>{
+  let popupElement = document.createElement("div");
+  popupElement.className = 'popup__inner';
+  popupElement.innerHTML = `
+  <button class="popup__close" type="button" aria-label="Закрыть">
+    <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292893 0.292893C0.683418 -0.0976311 1.31658 -0.0976311 1.70711 0.292893L8 6.58579L14.2929 0.292893C14.6834 -0.0976311 15.3166 -0.0976311 15.7071 0.292893C16.0976 0.683418 16.0976 1.31658 15.7071 1.70711L9.41421 8L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L8 9.41421L1.70711 15.7071C1.31658 16.0976 0.683418 16.0976 0.292893 15.7071C-0.0976311 15.3166 -0.0976311 14.6834 0.292893 14.2929L6.58579 8L0.292893 1.70711C-0.0976311 1.31658 -0.0976311 0.683418 0.292893 0.292893Z"/>
+    </svg>
+  </button>
+  <div class="popup__date">${dateTransform(data.publishDate)}</div>
+  <h3 class="popup__title">${data.name}</h3>
+  <div class="popup__price">${priceTransform(data.price)} ₽</div>
+  <div class="popup__columns">
+    <div class="popup__left">
+      <div class="popup__gallery gallery">
+        <button class="gallery__favourite fav-add">
+          <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M3 7C3 13 10 16.5 11 17C12 16.5 19 13 19 7C19 4.79086 17.2091 3 15 3C12 3 11 5 11 5C11 5 10 3 7 3C4.79086 3 3 4.79086 3 7Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="gallery__main-pic">
+          <img src="${data.photos[0]}" width="520" height="340" alt="${data.name}">
+        </div>
+        <ul class="gallery__list">
+          <li class="gallery__item gallery__item--active">
+            <img src="${data.photos[0]}" width="124" height="80" alt="Загородный дом">
+          </li>
+          <li class="gallery__item">
+            <img src="${data.photos[1]}" width="124" height="80" alt="Загородный дом">
+          </li>
+          <li class="gallery__item">
+            <img src="${data.photos[2]}" width="124" height="80" alt="Загородный дом">
+          </li>
+          <li class="gallery__item">
+            <img src="${data.photos[4]}" width="124" height="80" alt="Загородный дом">
+          </li>
+        </ul>
+      </div>
+      <ul class="popup__chars chars">
+        <li class="chars__item">
+          <div class="chars__name">Площадь</div>
+          <div class="chars__value">${data.filters.area}</div>
+        </li>
+        <li class="chars__item">
+          <div class="chars__name">Количество комнат</div>
+          <div class="chars__value">${data.filters.roomsCount}</div>
+        </li>
+        <li class="chars__item">
+          <div class="chars__name">Тип недвижимости</div>
+          <div class="chars__value">${data.filters.type}</div>
+        </li>
+      </ul>
+      <div class="popup__seller seller seller--good">
+        <h3>Продавец</h3>
+        <div class="seller__inner">
+          <a class="seller__name" href="#">${data.seller.fullname}</a>
+          <div class="seller__rating"><span>${data.seller.rating}</span></div>
+        </div>
+      </div>
+      <div class="popup__description">
+        <h3>Описание товара</h3>
+        <p>${data.description}</p>
+      </div>
+    </div>
+    <div class="popup__right">
+      <div class="popup__map">
+        <img src="img/map.jpg" width="268" height="180" alt="Москва, Нахимовский проспект, дом 5">
+      </div>
+      <div class="popup__address">${data.address.city}, ${data.address.street}, дом ${data.address.building}</div>
+    </div>
+  </div>`;
+  return popupFragment.appendChild(popupElement)
+}
 
 const popup = document.querySelector('.popup');
-const popupBtnClose = document.querySelector('.popup__close');
 
 const addEventsCards = cardsItems =>{
-  cardsItems.forEach(item => {
-    item.addEventListener('click', function(evt){
-      if (evt.target === item.querySelector('img') || evt.target === item.querySelector('a')){
+  cardsItems.forEach(card => {
+    card.addEventListener('click', function(evt){
+      if (evt.target === card.querySelector('img') || evt.target === card.querySelector('a')){
         evt.preventDefault();
+        clearHTMLItem(popup);
+        let cardData = getCardData(CARDS_LIST,evt.currentTarget.id);
+        let popupContentTemplate = createPopupContentFragment(cardData);
+        fillHTMLTemplates(popup,popupContentTemplate);
         openPopup();
       }
     })
@@ -209,6 +336,8 @@ const addEventsCards = cardsItems =>{
 }
 
 addEventsCards (cardsItemsList);
+
+const popupBtnClose = popup.querySelector('.popup__close');// нашёл первый и отчистили попап.
 
 const openPopup = () =>{
   popup.classList.add('popup--active');
@@ -220,7 +349,7 @@ const closePopup = () =>{
   removePopupEventListener();
 }
 
-const popupBtnCloseClick = (evt) =>{
+const popupBtnCloseClick = () =>{
   evt.preventDefault();
   closePopup();
 }
@@ -241,3 +370,4 @@ const removePopupEventListener = () =>{
   popupBtnClose.removeEventListener('click',popupBtnCloseClick);
   document.removeEventListener('keydown',popupPressEsc);
 }
+
