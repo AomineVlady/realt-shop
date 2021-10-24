@@ -87,7 +87,7 @@ const getUrlPhotos = (arr) => {
 
 const dateNow = Date.now();
 
-const getListCards = () => {
+const setListCards = () => {
   let list = [];
   for (let i = 0; i < COUNT_CARDS; i++) {
     list.push({
@@ -117,7 +117,7 @@ const getListCards = () => {
   return list;
 };
 
-const CARDS_LIST = getListCards();
+const CARDS_LIST = setListCards();
 
 var mySlider = new rSlider({
   target: '#sampleSlider',
@@ -201,9 +201,7 @@ const createCardFragment = (cards) => {
 };
 
 const cardsWrapper = document.querySelector('.results__list');
-const cardsListTemplate = createCardFragment(CARDS_LIST);
-
-const getCardItemsList = (wrap)  => wrap.querySelectorAll('.results__item');
+const getCardItemsList = (wrap) => wrap.querySelectorAll('.results__item');
 const popup = document.querySelector('.popup');
 
 const cardClick = (evt) => {
@@ -226,9 +224,34 @@ const removeEventListenerCards = cardsItems => {
   });
 }
 
-clearHTMLItem(cardsWrapper);
-fillHTMLTemplates(cardsWrapper, cardsListTemplate);
-addEventListenerCards(getCardItemsList(cardsWrapper));
+const updatedCards = (cardList) => {
+  clearHTMLItem(cardsWrapper);
+  fillHTMLTemplates(cardsWrapper, createCardFragment(cardList));
+  addEventListenerCards(getCardItemsList(cardsWrapper));
+}
+
+updatedCards(CARDS_LIST);
+
+const sortbyField = (field,list) => {
+  if (field == 'Популярные') {
+    return list.sort((a,b) => b.seller.rating - a.seller.rating);  
+  }
+  if (field == 'Дешёвые') {
+    return list.sort((a,b) => a.price - b.price);  
+  }
+  if (field == 'Новые') {
+    return list.sort((a,b) => b.publishDate - a.publishDate);
+  }
+}
+
+const sortBtnList = document.querySelectorAll('.sorting__order-tab label');
+sortBtnList.forEach(item =>{
+  item.addEventListener('click', (evt)=>{
+    let field =evt.target.textContent;
+    let sortedList = sortbyField(field,CARDS_LIST);
+    updatedCards(sortedList);
+  });
+}) 
 
 const getCardContentData = (list, id) => {
   for (let item of list) {
@@ -248,7 +271,6 @@ const getPhotoList = (list, name) => {
   }
   return result;
 }
-
 
 const createPopupContent = (wrap, data) => {
   let popupContent = document.createElement("div");
@@ -313,6 +335,7 @@ const createPopupContent = (wrap, data) => {
       <div class="popup__address">${data.address.city}, ${data.address.street}, дом ${data.address.building}</div>
     </div>
   </div>`;
+
   return wrap.appendChild(popupContent)
 }
 
@@ -320,18 +343,18 @@ const setActivePopupPhoto = (photo) => {
   photo.classList.add('gallery__item--active');
 }
 
-const removeActivePopupPhoto = (photo) =>{
+const removeActivePopupPhoto = (photo) => {
   photo.classList.remove('gallery__item--active');
 }
 
-const swapMainPhoto = (evt) =>{
+const swapMainPhoto = (evt) => {
   let mainPhoto = popup.querySelector('.gallery__main-pic').querySelector('img');
   let popupPhotoList = popup.querySelectorAll('.gallery__item')
   for (const photo of popupPhotoList) {
     removeActivePopupPhoto(photo);
   }
   setActivePopupPhoto(evt.currentTarget);
-  mainPhoto.src = evt.target.src
+  mainPhoto.src = evt.target.src;
 }
 
 const openPopup = (cardData) => {
@@ -359,7 +382,7 @@ const popupPressEsc = (evt) => {
 }
 
 const initPopupEventListener = () => {
-  popup.querySelectorAll('.gallery__item').forEach(item=>{
+  popup.querySelectorAll('.gallery__item').forEach(item => {
     item.addEventListener('click', swapMainPhoto)
   });
   popup.querySelector('.popup__close').addEventListener('click', popupBtnCloseClick);
@@ -367,10 +390,9 @@ const initPopupEventListener = () => {
 }
 
 const removePopupEventListener = () => {
-  popup.querySelectorAll('.gallery__item').forEach(item=>{
+  popup.querySelectorAll('.gallery__item').forEach(item => {
     item.removeEventListener('click', swapMainPhoto)
   });
   popup.querySelector('.popup__close').removeEventListener('click', popupBtnCloseClick);
   document.removeEventListener('keydown', popupPressEsc);
 }
-
