@@ -4,11 +4,11 @@ const COUNT_CARDS = 7;
 const COUNT_PHOTOS_MAX = 4;
 const COUNT_PHOTOS_MIN = 1;
 const COUNT_ROOMS = 7;
-const MIN_COUNT_AREA = 30; 
-const MAX_COUNT_AREA = 250; 
-const BUILDING_MAX = 40; 
-const BUILDING_MIN = 1; 
-const RATING_MAX = 5; 
+const MIN_COUNT_AREA = 30;
+const MAX_COUNT_AREA = 250;
+const BUILDING_MAX = 40;
+const BUILDING_MIN = 1;
+const RATING_MAX = 5;
 const PRICE_MIN = 250000;
 const PRICE_MAX = 2000000;
 const PRODUCT_CATEGORY = "Недвижимость";
@@ -60,7 +60,7 @@ const filtersTypeList = [
 
 const photosUrlList = [
   "img/apt_1.png",
-  "img/apt_2.png" ,
+  "img/apt_2.png",
   "img/apt_3.png",
   "img/apt_4.png",
   "img/apt_5.png",
@@ -71,14 +71,14 @@ const photosUrlList = [
   "img/house_4.png"
 ];
 
-const getRandomInt = (min,max) => Math.floor(Math.random() * (max - min) + min);
+const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min) + min);
 
-const getUrlPhotos = (arr) => {           
+const getUrlPhotos = (arr) => {
   let urls = [];
-  let count = getRandomInt(COUNT_PHOTOS_MIN,COUNT_PHOTOS_MAX);
-  while(urls.length !== count) {
-    let rndElem = arr[getRandomInt(0,arr.length)];
-    if(!urls.includes(rndElem)){
+  let count = getRandomInt(COUNT_PHOTOS_MIN, COUNT_PHOTOS_MAX);
+  while (urls.length !== count) {
+    let rndElem = arr[getRandomInt(0, arr.length)];
+    if (!urls.includes(rndElem)) {
       urls.push(rndElem);
     };
   };
@@ -87,30 +87,30 @@ const getUrlPhotos = (arr) => {
 
 const dateNow = Date.now();
 
-const getListCards = () =>{
+const getListCards = () => {
   let list = [];
   for (let i = 0; i < COUNT_CARDS; i++) {
     list.push({
       card_id: `card_${i}`,
-      name: nameList[getRandomInt(0,nameList.length)],
-      description: descriptionList[getRandomInt(0,descriptionList.length)],
-      price: getRandomInt(PRICE_MIN,PRICE_MAX),
+      name: nameList[getRandomInt(0, nameList.length)],
+      description: descriptionList[getRandomInt(0, descriptionList.length)],
+      price: getRandomInt(PRICE_MIN, PRICE_MAX),
       category: PRODUCT_CATEGORY,
-      seller:{
-        fullname:sellerNameList[getRandomInt(0,sellerNameList.length)],
-        rating: getRandomInt(0,RATING_MAX*10)/10
+      seller: {
+        fullname: sellerNameList[getRandomInt(0, sellerNameList.length)],
+        rating: getRandomInt(0, RATING_MAX * 10) / 10
       },
-      publishDate: dateNow - (getRandomInt(0,MAX_DAYS_MILLISECONDS)),
-      address:{
-        city: cityList[getRandomInt(0,cityList.length)],
-        street: streetList[getRandomInt(0,streetList.length)],
-        building: getRandomInt(BUILDING_MIN,BUILDING_MAX)
+      publishDate: dateNow - (getRandomInt(0, MAX_DAYS_MILLISECONDS)),
+      address: {
+        city: cityList[getRandomInt(0, cityList.length)],
+        street: streetList[getRandomInt(0, streetList.length)],
+        building: getRandomInt(BUILDING_MIN, BUILDING_MAX)
       },
       photos: getUrlPhotos(photosUrlList),
-      filters:{
-        type: filtersTypeList[getRandomInt(0,filtersTypeList.length)],
+      filters: {
+        type: filtersTypeList[getRandomInt(0, filtersTypeList.length)],
         area: getRandomInt(MIN_COUNT_AREA, MAX_COUNT_AREA),
-        roomsCount:getRandomInt(1,COUNT_ROOMS)
+        roomsCount: getRandomInt(1, COUNT_ROOMS)
       }
     })
   }
@@ -131,75 +131,46 @@ var mySlider = new rSlider({
 
 const priceTransform = (arg) => {
   let argString = arg.toString().split('');
-  if (argString.length>3) {
-    for (let i = argString.length-4; i >= 0; i-=3) {
-        argString[i] += " ";
+  if (argString.length > 3) {
+    for (let i = argString.length - 4; i >= 0; i -= 3) {
+      argString[i] += " ";
     }
   }
   return argString.join('');
 };
 
-const transformMonthNubmerToString = (month) =>{
-  switch (+month) {
-    case 1:
-      return 'Января';
-    case 2:
-      return 'Февраля';
-    case 3:
-      return 'Марта';
-    case 4:
-      return 'Апереля';
-    case 5:
-      return 'Мая';
-    case 6:
-      return 'Июня';
-    case 7:
-      return 'Июля';
-    case 8:
-      return 'Августа';
-    case 9:
-      return 'Сентября';
-    case 10:
-      return 'Октября';
-    case 11:
-      return 'Ноября';
-    case 12:
-      return 'Декабря';
-    default:
-      return "month"
-  }
+const transformMonthNubmerToString = (month) => {
+  let monthsList = ['Января', 'Февраля', 'Марта', 'Апереля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря']
+  return monthsList[month];
 }
 
-const dateTransform = (arg) =>{
+const dateTransform = (arg) => {
   let dateDifference = dateNow - arg;
   let day = 86400000;
-  if (dateDifference<=day) {
+  if (dateDifference <= day) {
     return "Сегодня";
   }
-  if (dateDifference>day && dateDifference<= day*2) {
+  if (dateDifference > day && dateDifference <= day * 2) {
     return "Вчера"
   }
-  else{
+  else {
     let resultDate = new Date(arg);
-    return `${resultDate.getDate()} ${transformMonthNubmerToString(resultDate.getUTCMonth()+1)} ${resultDate.getFullYear()}`
+
+    return `${resultDate.getDate()} ${transformMonthNubmerToString(resultDate.getUTCMonth())} ${resultDate.getFullYear()}`
   }
 }
-
-
-const cardsWrapper = document.querySelector('.results__list');
-const cardFragment = document.createDocumentFragment();
 
 const clearHTMLItem = item => {
   item.innerHTML = "";
 }
 
-const fillHTMLTemplates = (wrapper,template) =>{
+const fillHTMLTemplates = (wrapper, template) => {
   wrapper.appendChild(template);
 }
 
-clearHTMLItem(cardsWrapper);
+const cardFragment = document.createDocumentFragment();
 
-const createCardFragment = (cards) =>{
+const createCardFragment = (cards) => {
   for (const card of cards) {
     let cardElement = document.createElement("li");
     cardElement.className = 'results__item';
@@ -225,27 +196,52 @@ const createCardFragment = (cards) =>{
       </div>`;
     cardFragment.appendChild(cardElement);
   }
+
   return cardFragment;
 };
 
+const cardsWrapper = document.querySelector('.results__list');
 const cardsListTemplate = createCardFragment(CARDS_LIST);
 
-fillHTMLTemplates(cardsWrapper,cardsListTemplate);
+const getCardItemsList = (wrap)  => wrap.querySelectorAll('.results__item');
+const popup = document.querySelector('.popup');
 
-const cardsItemsList = cardsWrapper.querySelectorAll('.results__item');
+const cardClick = (evt) => {
+  if (evt.target === evt.currentTarget.querySelector('img') || evt.target === evt.currentTarget.querySelector('a')) {
+    evt.preventDefault();
+    let cardData = getCardContentData(CARDS_LIST, evt.currentTarget.id);
+    openPopup(cardData);
+  }
+}
 
-const getCardData = (list,id) =>{
+const addEventListenerCards = cardsItems => {
+  cardsItems.forEach(card => {
+    card.addEventListener('click', cardClick)
+  });
+}
+
+const removeEventListenerCards = cardsItems => {
+  cardsItems.forEach(card => {
+    card.removeEventListener('click', cardClick)
+  });
+}
+
+clearHTMLItem(cardsWrapper);
+fillHTMLTemplates(cardsWrapper, cardsListTemplate);
+addEventListenerCards(getCardItemsList(cardsWrapper));
+
+const getCardContentData = (list, id) => {
   for (let item of list) {
     if (item.card_id === id) {
-      return item; 
+      return item;
     }
   }
 }
 
-const getPhotoList = (list,name) => {
+const getPhotoList = (list, name) => {
   let result = '';
   for (let i = 1; i < list.length; i++) {
-    result+= `
+    result += `
   <li class="gallery__item">
     <img src="${list[i]}" width="124" height="80" alt="${name}">
   </li>`;
@@ -253,12 +249,11 @@ const getPhotoList = (list,name) => {
   return result;
 }
 
-const popupFragment = document.createDocumentFragment();
 
-const createPopupContentFragment = (data) =>{
-  let popupElement = document.createElement("div");
-  popupElement.className = 'popup__inner';
-  popupElement.innerHTML = `
+const createPopupContent = (wrap, data) => {
+  let popupContent = document.createElement("div");
+  popupContent.className = 'popup__inner';
+  popupContent.innerHTML = `
   <button class="popup__close" type="button" aria-label="Закрыть">
     <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
       <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292893 0.292893C0.683418 -0.0976311 1.31658 -0.0976311 1.70711 0.292893L8 6.58579L14.2929 0.292893C14.6834 -0.0976311 15.3166 -0.0976311 15.7071 0.292893C16.0976 0.683418 16.0976 1.31658 15.7071 1.70711L9.41421 8L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L8 9.41421L1.70711 15.7071C1.31658 16.0976 0.683418 16.0976 0.292893 15.7071C-0.0976311 15.3166 -0.0976311 14.6834 0.292893 14.2929L6.58579 8L0.292893 1.70711C-0.0976311 1.31658 -0.0976311 0.683418 0.292893 0.292893Z"/>
@@ -282,7 +277,7 @@ const createPopupContentFragment = (data) =>{
           <li class="gallery__item gallery__item--active">
             <img src="${data.photos[0]}" width="124" height="80" alt="${data.name}">
           </li>
-          ${getPhotoList(data.photos,data.name)}
+          ${getPhotoList(data.photos, data.name)}
         </ul>
       </div>
       <ul class="popup__chars chars">
@@ -318,60 +313,64 @@ const createPopupContentFragment = (data) =>{
       <div class="popup__address">${data.address.city}, ${data.address.street}, дом ${data.address.building}</div>
     </div>
   </div>`;
-  return popupFragment.appendChild(popupElement)
+  return wrap.appendChild(popupContent)
 }
 
-const popup = document.querySelector('.popup');
-
-const addEventsCards = cardsItems =>{
-  cardsItems.forEach(card => {
-    card.addEventListener('click', function(evt){
-      if (evt.target === card.querySelector('img') || evt.target === card.querySelector('a')){
-        evt.preventDefault();
-        clearHTMLItem(popup);
-        let cardData = getCardData(CARDS_LIST,evt.currentTarget.id);
-        let popupContentTemplate = createPopupContentFragment(cardData);
-        fillHTMLTemplates(popup,popupContentTemplate);
-        openPopup();
-      }
-    })
-  });
+const setActivePopupPhoto = (photo) => {
+  photo.classList.add('gallery__item--active');
 }
 
-addEventsCards (cardsItemsList);
+const removeActivePopupPhoto = (photo) =>{
+  photo.classList.remove('gallery__item--active');
+}
 
-const popupBtnClose = popup.querySelector('.popup__close');
+const swapMainPhoto = (evt) =>{
+  let mainPhoto = popup.querySelector('.gallery__main-pic').querySelector('img');
+  let popupPhotoList = popup.querySelectorAll('.gallery__item')
+  for (const photo of popupPhotoList) {
+    removeActivePopupPhoto(photo);
+  }
+  setActivePopupPhoto(evt.currentTarget);
+  mainPhoto.src = evt.target.src
+}
 
-
-const openPopup = () =>{
+const openPopup = (cardData) => {
+  clearHTMLItem(popup);
+  fillHTMLTemplates(popup, createPopupContent(popup, cardData));
   popup.classList.add('popup--active');
   initPopupEventListener();
 }
 
-const closePopup = () =>{
+const closePopup = () => {
   popup.classList.remove('popup--active');
   removePopupEventListener();
 }
 
-const popupBtnCloseClick = () =>{
+const popupBtnCloseClick = (evt) => {
   evt.preventDefault();
   closePopup();
 }
 
 const popupPressEsc = (evt) => {
   if (evt.key === 'Escape') {
-      evt.preventDefault()
-      closePopup();       
+    evt.preventDefault()
+    closePopup();
   }
 }
 
-const initPopupEventListener = () =>{
-  popupBtnClose.addEventListener('click',popupBtnCloseClick);
-  document.addEventListener('keydown',popupPressEsc);
+const initPopupEventListener = () => {
+  popup.querySelectorAll('.gallery__item').forEach(item=>{
+    item.addEventListener('click', swapMainPhoto)
+  });
+  popup.querySelector('.popup__close').addEventListener('click', popupBtnCloseClick);
+  document.addEventListener('keydown', popupPressEsc);
 }
 
-const removePopupEventListener = () =>{
-  popupBtnClose.removeEventListener('click',popupBtnCloseClick);
-  document.removeEventListener('keydown',popupPressEsc);
+const removePopupEventListener = () => {
+  popup.querySelectorAll('.gallery__item').forEach(item=>{
+    item.removeEventListener('click', swapMainPhoto)
+  });
+  popup.querySelector('.popup__close').removeEventListener('click', popupBtnCloseClick);
+  document.removeEventListener('keydown', popupPressEsc);
 }
 
