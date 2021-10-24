@@ -242,6 +242,17 @@ const getCardData = (list,id) =>{
   }
 }
 
+const getPhotoList = (list,name) => {
+  let result = '';
+  for (let i = 1; i < list.length; i++) {
+    result+= `
+  <li class="gallery__item">
+    <img src="${list[i]}" width="124" height="80" alt="${name}">
+  </li>`;
+  }
+  return result;
+}
+
 const popupFragment = document.createDocumentFragment();
 
 const createPopupContentFragment = (data) =>{
@@ -269,17 +280,9 @@ const createPopupContentFragment = (data) =>{
         </div>
         <ul class="gallery__list">
           <li class="gallery__item gallery__item--active">
-            <img src="${data.photos[0]}" width="124" height="80" alt="Загородный дом">
+            <img src="${data.photos[0]}" width="124" height="80" alt="${data.name}">
           </li>
-          <li class="gallery__item">
-            <img src="${data.photos[1]}" width="124" height="80" alt="Загородный дом">
-          </li>
-          <li class="gallery__item">
-            <img src="${data.photos[2]}" width="124" height="80" alt="Загородный дом">
-          </li>
-          <li class="gallery__item">
-            <img src="${data.photos[4]}" width="124" height="80" alt="Загородный дом">
-          </li>
+          ${getPhotoList(data.photos,data.name)}
         </ul>
       </div>
       <ul class="popup__chars chars">
@@ -337,7 +340,8 @@ const addEventsCards = cardsItems =>{
 
 addEventsCards (cardsItemsList);
 
-const popupBtnClose = popup.querySelector('.popup__close');// нашёл первый и отчистили попап.
+const popupBtnClose = popup.querySelector('.popup__close');
+
 
 const openPopup = () =>{
   popup.classList.add('popup--active');
