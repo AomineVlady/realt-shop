@@ -230,28 +230,29 @@ const updatedCards = (cardList) => {
   addEventListenerCards(getCardItemsList(cardsWrapper));
 }
 
-updatedCards(CARDS_LIST);
-
-const sortbyField = (field,list) => {
-  if (field == 'Популярные') {
-    return list.sort((a,b) => b.seller.rating - a.seller.rating);  
+const sortbyField = (field, list) => {
+  if (field == 'popular') {
+    return list.sort((a, b) => b.seller.rating - a.seller.rating);
   }
-  if (field == 'Дешёвые') {
-    return list.sort((a,b) => a.price - b.price);  
+  if (field == 'cheap') {
+    return list.sort((a, b) => a.price - b.price);
   }
-  if (field == 'Новые') {
-    return list.sort((a,b) => b.publishDate - a.publishDate);
+  if (field == 'new') {
+    return list.sort((a, b) => b.publishDate - a.publishDate);
   }
 }
 
-const sortBtnList = document.querySelectorAll('.sorting__order-tab label');
-sortBtnList.forEach(item =>{
-  item.addEventListener('click', (evt)=>{
-    let field =evt.target.textContent;
-    let sortedList = sortbyField(field,CARDS_LIST);
+const sortBtnList = document.querySelectorAll('.sorting__order-tab input[name=sorting-order]');
+
+updatedCards(sortbyField(sortBtnList[0].value, CARDS_LIST));
+
+sortBtnList.forEach(item => {
+  item.addEventListener('change', (evt) => {
+    let field = evt.target.value;
+    let sortedList = sortbyField(field, CARDS_LIST);
     updatedCards(sortedList);
   });
-}) 
+})
 
 const getCardContentData = (list, id) => {
   for (let item of list) {
@@ -381,12 +382,21 @@ const popupPressEsc = (evt) => {
   }
 }
 
+const overlayPopupClick = (evt) =>{
+  evt.preventDefault();
+  if (evt.target.classList.contains('popup')) {
+    closePopup();
+    removePopupEventListener();
+  }
+}
+
 const initPopupEventListener = () => {
   popup.querySelectorAll('.gallery__item').forEach(item => {
     item.addEventListener('click', swapMainPhoto)
   });
   popup.querySelector('.popup__close').addEventListener('click', popupBtnCloseClick);
   document.addEventListener('keydown', popupPressEsc);
+  popup.addEventListener('click', overlayPopupClick);
 }
 
 const removePopupEventListener = () => {
@@ -395,4 +405,6 @@ const removePopupEventListener = () => {
   });
   popup.querySelector('.popup__close').removeEventListener('click', popupBtnCloseClick);
   document.removeEventListener('keydown', popupPressEsc);
+  popup.removeEventListener('click', overlayPopupClick);
 }
+
