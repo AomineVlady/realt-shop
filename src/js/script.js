@@ -14,6 +14,15 @@ const PRICE_MAX = 2000000;
 const PRODUCT_CATEGORY = "Недвижимость";
 const MAX_DAYS_MILLISECONDS = 432000000;
 
+const dateNow = Date.now();
+
+const monthsList = [
+  'Января', 'Февраля', 'Марта',
+  'Апереля', 'Мая', 'Июня',
+  'Июля', 'Августа', 'Сентября',
+  'Октября', 'Ноября', 'Декабря'
+];
+
 const nameList = [
   'Двушка в центре Питера',
   'Однушка в спальнике Питера',
@@ -71,6 +80,10 @@ const photosUrlList = [
   "img/house_4.png"
 ];
 
+const cardsWrapper = document.querySelector('.results__list');
+const popup = document.querySelector('.popup');
+const sortBtnList = document.querySelectorAll('.sorting__order-tab input[name=sorting-order]');
+
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min) + min);
 
 const getUrlPhotos = (arr) => {
@@ -82,13 +95,12 @@ const getUrlPhotos = (arr) => {
       urls.push(rndElem);
     };
   };
+
   return urls;
 };
 
-const dateNow = Date.now();
-
 const setListCards = () => {
-  let list = [];
+  const list = [];
   for (let i = 0; i < COUNT_CARDS; i++) {
     list.push({
       card_id: `card_${i}`,
@@ -98,7 +110,7 @@ const setListCards = () => {
       category: PRODUCT_CATEGORY,
       seller: {
         fullname: sellerNameList[getRandomInt(0, sellerNameList.length)],
-        rating: getRandomInt(0, RATING_MAX * 10) / 10
+        rating: getRandomInt(0, RATING_MAX * 10) / 10,
       },
       publishDate: dateNow - (getRandomInt(0, MAX_DAYS_MILLISECONDS)),
       address: {
@@ -110,14 +122,15 @@ const setListCards = () => {
       filters: {
         type: filtersTypeList[getRandomInt(0, filtersTypeList.length)],
         area: getRandomInt(MIN_COUNT_AREA, MAX_COUNT_AREA),
-        roomsCount: getRandomInt(1, COUNT_ROOMS)
-      }
+        roomsCount: getRandomInt(1, COUNT_ROOMS),
+      },
     })
   }
+
   return list;
 };
 
-const CARDS_LIST = setListCards();
+const cardsList = setListCards();
 
 var mySlider = new rSlider({
   target: '#sampleSlider',
@@ -130,7 +143,7 @@ var mySlider = new rSlider({
 });
 
 const priceTransform = (arg) => {
-  let argString = arg.toString().split('');
+  const argString = arg.toString().split('');
   if (argString.length > 3) {
     for (let i = argString.length - 4; i >= 0; i -= 3) {
       argString[i] += " ";
@@ -139,14 +152,9 @@ const priceTransform = (arg) => {
   return argString.join('');
 };
 
-const transformMonthNubmerToString = (month) => {
-  let monthsList = ['Января', 'Февраля', 'Марта', 'Апереля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря']
-  return monthsList[month];
-}
-
 const dateTransform = (arg) => {
-  let dateDifference = dateNow - arg;
-  let day = 86400000;
+  const dateDifference = dateNow - arg;
+  const day = 86400000;
   if (dateDifference <= day) {
     return "Сегодня";
   }
@@ -154,10 +162,24 @@ const dateTransform = (arg) => {
     return "Вчера"
   }
   else {
-    let resultDate = new Date(arg);
+    const resultDate = new Date(arg);
 
-    return `${resultDate.getDate()} ${transformMonthNubmerToString(resultDate.getUTCMonth())} ${resultDate.getFullYear()}`
+    return `${resultDate.getDate()} ${monthsList[resultDate.getUTCMonth()]} ${resultDate.getFullYear()}`
   }
+}
+
+const getCardContentData = (list, id) => {
+  for (let item of list) {
+    if (item.card_id === id) {
+      return item;
+    }
+  }
+}
+
+const getTamplateTag = (tagText) => {
+  const div = document.createElement('div');
+  div.insertAdjacentHTML('beforeend', tagText);
+  return div.firstElementChild;
 }
 
 const clearHTMLItem = item => {
@@ -165,18 +187,17 @@ const clearHTMLItem = item => {
 }
 
 const fillHTMLTemplates = (wrapper, template) => {
-  wrapper.appendChild(template);
+  const fragment = document.createDocumentFragment();
+  fragment.appendChild(getTamplateTag(template));
+  wrapper.appendChild(fragment);
 }
 
-const cardFragment = document.createDocumentFragment();
+const checkEmptyContent = (content,data) => {
+  return (data == null || data == "") ? "" : content;
+} 
 
-const createCardFragment = (cards) => {
-  for (const card of cards) {
-    let cardElement = document.createElement("li");
-    cardElement.className = 'results__item';
-    cardElement.classList.add('product');
-    cardElement.id = card.card_id;
-    cardElement.innerHTML = `
+const getCardsElements = (card) => {
+  return `<li class="results__item product" id = "${card.card_id}">
       <button class="product__favourite fav-add" type="button" aria-label="Добавить в избранное">
         <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path fill-rule="evenodd" clip-rule="evenodd" d="M3 7C3 13 10 16.5 11 17C12 16.5 19 13 19 7C19 4.79086 17.2091 3 15 3C12 3 11 5 11 5C11 5 10 3 7 3C4.79086 3 3 4.79086 3 7Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
@@ -193,22 +214,14 @@ const createCardFragment = (cards) => {
         <div class="product__price">${priceTransform(card.price)} ₽</div>
         <div class="product__address">${card.address.city} ${card.address.street} ${card.address.building}</div>
         <div class="product__date">${dateTransform(card.publishDate)}</div>
-      </div>`;
-    cardFragment.appendChild(cardElement);
-  }
-
-  return cardFragment;
+      </div>
+    </li>`;
 };
-
-const cardsWrapper = document.querySelector('.results__list');
-const getCardItemsList = (wrap) => wrap.querySelectorAll('.results__item');
-const popup = document.querySelector('.popup');
 
 const cardClick = (evt) => {
   if (evt.target === evt.currentTarget.querySelector('img') || evt.target === evt.currentTarget.querySelector('a')) {
     evt.preventDefault();
-    let cardData = getCardContentData(CARDS_LIST, evt.currentTarget.id);
-    openPopup(cardData);
+    openPopup(getCardContentData(cardsList, evt.currentTarget.id));
   }
 }
 
@@ -224,43 +237,34 @@ const removeEventListenerCards = cardsItems => {
   });
 }
 
-const updatedCards = (cardList) => {
+const renderCards = (cardList) => {
+  removeEventListenerCards(cardsWrapper.querySelectorAll('.results__item'));
   clearHTMLItem(cardsWrapper);
-  fillHTMLTemplates(cardsWrapper, createCardFragment(cardList));
-  addEventListenerCards(getCardItemsList(cardsWrapper));
+  for (const card of cardList) {
+    fillHTMLTemplates(cardsWrapper, getCardsElements(card));
+  }
+  addEventListenerCards(cardsWrapper.querySelectorAll('.results__item'));
 }
 
-const sortbyField = (field, list) => {
-  if (field == 'popular') {
-    return list.sort((a, b) => b.seller.rating - a.seller.rating);
-  }
-  if (field == 'cheap') {
-    return list.sort((a, b) => a.price - b.price);
-  }
-  if (field == 'new') {
-    return list.sort((a, b) => b.publishDate - a.publishDate);
+const sortbyField = (field) => {
+  const copyDataList = cardsList.slice();
+  switch (field) {
+    case 'popular':
+      return copyDataList;
+    case 'cheap':
+      return copyDataList.sort((first, second) => first.price - second.price);
+    case 'new':
+      return copyDataList.sort((first, second) => second.publishDate - first.publishDate);
   }
 }
 
-const sortBtnList = document.querySelectorAll('.sorting__order-tab input[name=sorting-order]');
-
-updatedCards(sortbyField(sortBtnList[0].value, CARDS_LIST));
+renderCards(cardsList);
 
 sortBtnList.forEach(item => {
   item.addEventListener('change', (evt) => {
-    let field = evt.target.value;
-    let sortedList = sortbyField(field, CARDS_LIST);
-    updatedCards(sortedList);
+    renderCards(sortbyField(evt.target.value));
   });
 })
-
-const getCardContentData = (list, id) => {
-  for (let item of list) {
-    if (item.card_id === id) {
-      return item;
-    }
-  }
-}
 
 const getPhotoList = (list, name) => {
   let result = '';
@@ -273,94 +277,88 @@ const getPhotoList = (list, name) => {
   return result;
 }
 
-const createPopupContent = (wrap, data) => {
-  let popupContent = document.createElement("div");
-  popupContent.className = 'popup__inner';
-  popupContent.innerHTML = `
-  <button class="popup__close" type="button" aria-label="Закрыть">
-    <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292893 0.292893C0.683418 -0.0976311 1.31658 -0.0976311 1.70711 0.292893L8 6.58579L14.2929 0.292893C14.6834 -0.0976311 15.3166 -0.0976311 15.7071 0.292893C16.0976 0.683418 16.0976 1.31658 15.7071 1.70711L9.41421 8L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L8 9.41421L1.70711 15.7071C1.31658 16.0976 0.683418 16.0976 0.292893 15.7071C-0.0976311 15.3166 -0.0976311 14.6834 0.292893 14.2929L6.58579 8L0.292893 1.70711C-0.0976311 1.31658 -0.0976311 0.683418 0.292893 0.292893Z"/>
-    </svg>
-  </button>
-  <div class="popup__date">${dateTransform(data.publishDate)}</div>
-  <h3 class="popup__title">${data.name}</h3>
-  <div class="popup__price">${priceTransform(data.price)} ₽</div>
-  <div class="popup__columns">
-    <div class="popup__left">
-      <div class="popup__gallery gallery">
-        <button class="gallery__favourite fav-add">
-          <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M3 7C3 13 10 16.5 11 17C12 16.5 19 13 19 7C19 4.79086 17.2091 3 15 3C12 3 11 5 11 5C11 5 10 3 7 3C4.79086 3 3 4.79086 3 7Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="gallery__main-pic">
-          <img src="${data.photos[0]}" width="520" height="340" alt="${data.name}">
+const getPopupElement = (data) => {
+  return `
+  <div class = "popup__inner">
+    <button class="popup__close" type="button" aria-label="Закрыть">
+      <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292893 0.292893C0.683418 -0.0976311 1.31658 -0.0976311 1.70711 0.292893L8 6.58579L14.2929 0.292893C14.6834 -0.0976311 15.3166 -0.0976311 15.7071 0.292893C16.0976 0.683418 16.0976 1.31658 15.7071 1.70711L9.41421 8L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L8 9.41421L1.70711 15.7071C1.31658 16.0976 0.683418 16.0976 0.292893 15.7071C-0.0976311 15.3166 -0.0976311 14.6834 0.292893 14.2929L6.58579 8L0.292893 1.70711C-0.0976311 1.31658 -0.0976311 0.683418 0.292893 0.292893Z"/>
+      </svg>
+    </button>
+    <div class="popup__date">${dateTransform(data.publishDate)}</div>
+    <h3 class="popup__title">${data.name}</h3>
+    <div class="popup__price">${priceTransform(data.price)} ₽</div>
+    <div class="popup__columns">
+      <div class="popup__left">
+        <div class="popup__gallery gallery">
+          <button class="gallery__favourite fav-add">
+            <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M3 7C3 13 10 16.5 11 17C12 16.5 19 13 19 7C19 4.79086 17.2091 3 15 3C12 3 11 5 11 5C11 5 10 3 7 3C4.79086 3 3 4.79086 3 7Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="gallery__main-pic">
+            <img src="${data.photos[0]}" width="520" height="340" alt="${data.name}">
+          </div>
+          <ul class="gallery__list">
+            <li class="gallery__item gallery__item--active">
+              <img src="${data.photos[0]}" width="124" height="80" alt="${data.name}">
+            </li>
+            ${getPhotoList(data.photos, data.name)}
+          </ul>
         </div>
-        <ul class="gallery__list">
-          <li class="gallery__item gallery__item--active">
-            <img src="${data.photos[0]}" width="124" height="80" alt="${data.name}">
-          </li>
-          ${getPhotoList(data.photos, data.name)}
+        <ul class="popup__chars chars">
+          ${checkEmptyContent(`<li class="chars__item">
+            <div class="chars__name">Площадь</div>
+            <div class="chars__value">${data.filters.area}</div>
+          </li>`, data.filters.area)}
+          ${checkEmptyContent(`<li class="chars__item">
+            <div class="chars__name">Количество комнат</div>
+            <div class="chars__value">${data.filters.roomsCount}</div>
+          </li>`, data.filters.roomsCount)}
+          ${checkEmptyContent(`<li class="chars__item">
+            <div class="chars__name">Тип недвижимости</div>
+            <div class="chars__value">${data.filters.type}</div>
+          </li>`,data.filters.type)}
         </ul>
-      </div>
-      <ul class="popup__chars chars">
-        <li class="chars__item">
-          <div class="chars__name">Площадь</div>
-          <div class="chars__value">${data.filters.area}</div>
-        </li>
-        <li class="chars__item">
-          <div class="chars__name">Количество комнат</div>
-          <div class="chars__value">${data.filters.roomsCount}</div>
-        </li>
-        <li class="chars__item">
-          <div class="chars__name">Тип недвижимости</div>
-          <div class="chars__value">${data.filters.type}</div>
-        </li>
-      </ul>
-      <div class="popup__seller seller seller--good">
-        <h3>Продавец</h3>
-        <div class="seller__inner">
-          <a class="seller__name" href="#">${data.seller.fullname}</a>
-          <div class="seller__rating"><span>${data.seller.rating}</span></div>
+        <div class="popup__seller seller seller--good">
+          <h3>Продавец</h3>
+          <div class="seller__inner">
+            <a class="seller__name" href="#">${data.seller.fullname}</a>
+            <div class="seller__rating"><span>${data.seller.rating}</span></div>
+          </div>
+        </div>
+        <div class="popup__description">
+          <h3>Описание товара</h3>
+          <p>${data.description}</p>
         </div>
       </div>
-      <div class="popup__description">
-        <h3>Описание товара</h3>
-        <p>${data.description}</p>
+      <div class="popup__right">
+        <div class="popup__map">
+          <img src="img/map.jpg" width="268" height="180" alt="Москва, Нахимовский проспект, дом 5">
+        </div>
+        <div class="popup__address">${data.address.city}, ${data.address.street}, дом ${data.address.building}</div>
       </div>
-    </div>
-    <div class="popup__right">
-      <div class="popup__map">
-        <img src="img/map.jpg" width="268" height="180" alt="Москва, Нахимовский проспект, дом 5">
-      </div>
-      <div class="popup__address">${data.address.city}, ${data.address.street}, дом ${data.address.building}</div>
     </div>
   </div>`;
-
-  return wrap.appendChild(popupContent)
 }
 
-const setActivePopupPhoto = (photo) => {
-  photo.classList.add('gallery__item--active');
-}
-
-const removeActivePopupPhoto = (photo) => {
-  photo.classList.remove('gallery__item--active');
+const setActivePicture = (picture) => {
+  const popupPhotoList = popup.querySelectorAll('.gallery__item');
+  for (const photo of popupPhotoList) {
+    photo.classList.remove('gallery__item--active');
+  }
+  picture.currentTarget.classList.add('gallery__item--active');
 }
 
 const swapMainPhoto = (evt) => {
-  let mainPhoto = popup.querySelector('.gallery__main-pic').querySelector('img');
-  let popupPhotoList = popup.querySelectorAll('.gallery__item')
-  for (const photo of popupPhotoList) {
-    removeActivePopupPhoto(photo);
-  }
-  setActivePopupPhoto(evt.currentTarget);
+  const mainPhoto = popup.querySelector('.gallery__main-pic').querySelector('img');
   mainPhoto.src = evt.target.src;
+  setActivePicture(evt);
 }
 
 const openPopup = (cardData) => {
   clearHTMLItem(popup);
-  fillHTMLTemplates(popup, createPopupContent(popup, cardData));
+  fillHTMLTemplates(popup, getPopupElement(cardData));
   popup.classList.add('popup--active');
   initPopupEventListener();
 }
@@ -382,11 +380,10 @@ const popupPressEsc = (evt) => {
   }
 }
 
-const overlayPopupClick = (evt) =>{
+const overlayPopupClick = (evt) => {
   evt.preventDefault();
   if (evt.target.classList.contains('popup')) {
     closePopup();
-    removePopupEventListener();
   }
 }
 
@@ -407,4 +404,3 @@ const removePopupEventListener = () => {
   document.removeEventListener('keydown', popupPressEsc);
   popup.removeEventListener('click', overlayPopupClick);
 }
-
