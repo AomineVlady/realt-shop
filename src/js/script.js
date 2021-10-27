@@ -13,7 +13,8 @@ const PRICE_MIN = 250000;
 const PRICE_MAX = 2000000;
 const PRODUCT_CATEGORY = "Недвижимость";
 const MAX_DAYS_MILLISECONDS = 432000000;
-
+localStorage.clear();
+const favoriteProducts = []
 const dateNow = Date.now();
 
 const monthsList = [
@@ -62,9 +63,9 @@ const streetList = [
 ];
 
 const filtersTypeList = [
-  'Дом',
-  'Апартаменты',
-  'Квартира'
+  'house',
+  'flat',
+  'apartments'
 ];
 
 const photosUrlList = [
@@ -81,14 +82,18 @@ const photosUrlList = [
 ];
 
 const cardsWrapper = document.querySelector('.results__list');
-const popup = document.querySelector('.popup');
 const sortBtnList = document.querySelectorAll('.sorting__order-tab input[name=sorting-order]');
+const filterBtn = document.querySelector('.filter__button');
+const popup = document.querySelector('.popup');
+let popupCloseBtn = popup.querySelector('.popup__close');
+let galleryList = popup.querySelectorAll('.gallery__item');
+
 
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min) + min);
 
 const getUrlPhotos = (arr) => {
-  let urls = [];
-  let count = getRandomInt(COUNT_PHOTOS_MIN, COUNT_PHOTOS_MAX);
+  const urls = [];
+  const count = getRandomInt(COUNT_PHOTOS_MIN, COUNT_PHOTOS_MAX);
   while (urls.length !== count) {
     let rndElem = arr[getRandomInt(0, arr.length)];
     if (!urls.includes(rndElem)) {
@@ -132,15 +137,17 @@ const setListCards = () => {
 
 const cardsList = setListCards();
 
-var mySlider = new rSlider({
+const mySlider = new rSlider({
   target: '#sampleSlider',
   values: [10000, 1000000],
   range: true,
   tooltip: true,
   scale: true,
-  labels: false,
-  step: 10000
+  labels: true,
+  step: [PRICE_MIN, PRICE_MAX]
 });
+
+
 
 const priceTransform = (arg) => {
   const argString = arg.toString().split('');
@@ -192,9 +199,9 @@ const fillHTMLTemplates = (wrapper, template) => {
   wrapper.appendChild(fragment);
 }
 
-const checkEmptyContent = (content,data) => {
-  return (data == null || data == "") ? "" : content;
-} 
+const checkEmptyContent = (content, data) => {
+  return (data == null || data == "" || data == 0) ? "" : content;
+}
 
 const getCardsElements = (card) => {
   return `<li class="results__item product" id = "${card.card_id}">
@@ -218,22 +225,40 @@ const getCardsElements = (card) => {
     </li>`;
 };
 
+
 const cardClick = (evt) => {
+  evt.preventDefault();
   if (evt.target === evt.currentTarget.querySelector('img') || evt.target === evt.currentTarget.querySelector('a')) {
-    evt.preventDefault();
     openPopup(getCardContentData(cardsList, evt.currentTarget.id));
   }
 }
 
+///////////////FAVORITE ADD\\\\\\\\\\\\\\\\\
+const favoriteBtn = document.querySelector('#favourites');
+
+favoriteBtn.addEventListener('change', ()=> {console.log(favoriteProducts)})
+
+const favoriteClick = (evt) => {
+  evt.preventDefault();
+  const card = getCardContentData(cardsList, evt.currentTarget.closest('.results__item').id);
+  !favoriteProducts.includes(card) ? favoriteProducts.push(card) : favoriteProducts.splice(favoriteProducts.indexOf(card),1);
+  !evt.currentTarget.classList.contains('fav-add--active') ? 
+  evt.currentTarget.classList.add('fav-add--active') : 
+  evt.currentTarget.classList.remove('fav-add--active');
+  localStorage.setItem('favoriteProducts', JSON.stringify(favoriteProducts));
+}
+
 const addEventListenerCards = cardsItems => {
   cardsItems.forEach(card => {
-    card.addEventListener('click', cardClick)
+    card.addEventListener('click', cardClick);
+    card.querySelector('button.fav-add').addEventListener('click', favoriteClick);
   });
 }
 
 const removeEventListenerCards = cardsItems => {
   cardsItems.forEach(card => {
-    card.removeEventListener('click', cardClick)
+    card.removeEventListener('click', cardClick);
+    card.querySelector('button.fav-add').removeEventListener('click', favoriteClick);
   });
 }
 
@@ -265,6 +290,26 @@ sortBtnList.forEach(item => {
     renderCards(sortbyField(evt.target.value));
   });
 })
+////////////////////////////////////filters/////////////////////////////////////////
+// const isCheckboxOrRadio = type => ['checkbox', 'radio'].includes(type);
+
+// const form = document.querySelector('.filter__form');
+
+// const setFormDate = (evt) => {
+//   evt.preventDefault();
+//   const values = {}
+//   for (const field of form) {
+//     const {name} = field;
+//     if (name) { 
+//       const {type, checked, value} = field;
+//       values[name] = isCheckboxOrRadio(type) ? checked : value;
+//     }
+//   }
+//  console.log(values)
+// };
+
+// form.addEventListener('submit', setFormDate);
+////////////////////////////////////////////////////////////////////////////////////
 
 const getPhotoList = (list, name) => {
   let result = '';
@@ -318,7 +363,7 @@ const getPopupElement = (data) => {
           ${checkEmptyContent(`<li class="chars__item">
             <div class="chars__name">Тип недвижимости</div>
             <div class="chars__value">${data.filters.type}</div>
-          </li>`,data.filters.type)}
+          </li>`, data.filters.type)}
         </ul>
         <div class="popup__seller seller seller--good">
           <h3>Продавец</h3>
@@ -360,6 +405,8 @@ const openPopup = (cardData) => {
   clearHTMLItem(popup);
   fillHTMLTemplates(popup, getPopupElement(cardData));
   popup.classList.add('popup--active');
+  popupCloseBtn = popup.querySelector('.popup__close');
+  galleryList = popup.querySelectorAll('.gallery__item');
   initPopupEventListener();
 }
 
@@ -388,19 +435,19 @@ const overlayPopupClick = (evt) => {
 }
 
 const initPopupEventListener = () => {
-  popup.querySelectorAll('.gallery__item').forEach(item => {
+  galleryList.forEach(item => {
     item.addEventListener('click', swapMainPhoto)
   });
-  popup.querySelector('.popup__close').addEventListener('click', popupBtnCloseClick);
+  popupCloseBtn.addEventListener('click', popupBtnCloseClick);
   document.addEventListener('keydown', popupPressEsc);
   popup.addEventListener('click', overlayPopupClick);
 }
 
 const removePopupEventListener = () => {
-  popup.querySelectorAll('.gallery__item').forEach(item => {
+  galleryList.forEach(item => {
     item.removeEventListener('click', swapMainPhoto)
   });
-  popup.querySelector('.popup__close').removeEventListener('click', popupBtnCloseClick);
+  popupCloseBtn.removeEventListener('click', popupBtnCloseClick);
   document.removeEventListener('keydown', popupPressEsc);
   popup.removeEventListener('click', overlayPopupClick);
 }

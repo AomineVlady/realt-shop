@@ -25,8 +25,15 @@
 }
 
 
-.fav-add svg{
+.fav-add--active{
+  width: 26px;
+  height: 26px;
+  top: 25px;
+  left: 26px;
+  outline: none;
+}
 
+.fav-add svg{
   display: block;
   transition: var(--animation);
 }
@@ -37,7 +44,7 @@
   height: 24px;
 }
 
- .fav-add:focus svg {
+.fav-add.fav-add--active svg {
   fill: var(--light-blue);
 }
 
@@ -46,14 +53,6 @@
   width: 22px;
   height: 20px;
  }
-
- .fav-add:focus {
-  width: 26px;
-  height: 26px;
-  top: 25px;
-  left: 26px;
-  outline: none;
-}
 
 .fav-add:hover:focus {
   fill: red;
