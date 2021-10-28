@@ -1,5 +1,7 @@
 "use strict"
 
+import './rSlider.min.js';
+
 const COUNT_CARDS = 7;
 const COUNT_PHOTOS_MAX = 4;
 const COUNT_PHOTOS_MIN = 1;
@@ -71,14 +73,23 @@ const photosUrlList = [
     "img/house_4.png"
 ];
 
+const getSliderValues = () => {
+    const pricesValues = [];
+    for (let i = PRICE_MIN; i < PRICE_MAX + 1; i += 1000) {
+        pricesValues.push(i);
+    }
+    return pricesValues;
+}
+
 const mySlider = new rSlider({
     target: '#sampleSlider',
-    values: [10000, 1000000],
+    values: getSliderValues(),
     range: true,
     tooltip: true,
     scale: true,
     labels: true,
-    step: [PRICE_MIN, PRICE_MAX]
+    set: [PRICE_MIN, PRICE_MAX],
+    step: 1000,
 });
 
 export const monthsList = [
@@ -179,6 +190,11 @@ const setListCards = () => {
 export const sortBtnList = document.querySelectorAll('.sorting__order-tab input[name=sorting-order]');
 
 export const cardsList = setListCards();
+export let cards = cardsList.slice();
+
+export const getCopyCardsList = arrCards => {
+    cards = arrCards.slice(); 
+}
 
 export const getCardContentData = (list, id) => {
     for (let item of list) {
