@@ -1,36 +1,50 @@
 "use strict"
-import { favoriteProducts, cardsList, getCardContentData, sortBtnList, filterBtn, filterForm } from './common.js';
+import { favoriteProducts, cardsList, getCardContentData, sortBtnList, filterBtn, filterForm, cardsWrapper } from './common.js';
 import { renderCards } from './render-cards.js';
 
 const favoriteListBtn = document.querySelector('#favourites');
 
+const setfavoriteCardsList = card => {
+    !favoriteProducts.includes(card) ?
+     favoriteProducts.push(card) :
+      favoriteProducts.splice(favoriteProducts.indexOf(card), 1);
+      localStorage.setItem('favoriteProducts', JSON.stringify(favoriteProducts));
+};
+
+const favAddBtnClassListToggle = btn =>  {
+    !btn.classList.contains('fav-add--active') ?
+     btn.classList.add('fav-add--active') :
+      btn.classList.remove('fav-add--active');
+}
+
 export const onCardListFavoriteClick = (evt) => {
     evt.preventDefault();
     const card = getCardContentData(cardsList, evt.currentTarget.closest('.results__item').id);
-    !favoriteProducts.includes(card) ? favoriteProducts.push(card) : favoriteProducts.splice(favoriteProducts.indexOf(card), 1);
-    !evt.currentTarget.classList.contains('fav-add--active') ?
-        evt.currentTarget.classList.add('fav-add--active') : evt.currentTarget.classList.remove('fav-add--active');
-    localStorage.setItem('favoriteProducts', JSON.stringify(favoriteProducts));
+    !card.favorite ? card.favorite = true : delete card.favorite;
+    setfavoriteCardsList(card);
+    favAddBtnClassListToggle(evt.currentTarget);
 };
 
-const disabledFields = () => {
-    filterBtn.hasAttribute('disabled') ? filterBtn.removeAttribute('disabled') : filterBtn.setAttribute('disabled', 'disabled');
+const toggleBlockFields = () => {
+    filterBtn.hasAttribute('disabled') ? filterBtn.removeAttribute('disabled') :
+     filterBtn.setAttribute('disabled', 'disabled');
     filterForm.querySelectorAll('input').forEach(item => {
-        item.hasAttribute('disabled') ? item.removeAttribute('disabled') : item.setAttribute('disabled', 'disabled');
+        item.hasAttribute('disabled') ? item.removeAttribute('disabled') :
+         item.setAttribute('disabled', 'disabled');
     });
     sortBtnList.forEach(item => {
-        item.hasAttribute('disabled') ? item.removeAttribute('disabled') : item.setAttribute('disabled', 'disabled');
+        item.hasAttribute('disabled') ? item.removeAttribute('disabled') :
+         item.setAttribute('disabled', 'disabled');
     });
 };
 
 favoriteListBtn.addEventListener('change', () => {
     if (favoriteListBtn.checked) {
-        disabledFields();
+        toggleBlockFields();
         renderCards(JSON.parse(localStorage.getItem('favoriteProducts')));
-        document.querySelectorAll('button.fav-add').forEach(item => item.classList.add('fav-add--active'));
     }
     else {
-        disabledFields();
+        toggleBlockFields();
         renderCards(cardsList);
     }
 });

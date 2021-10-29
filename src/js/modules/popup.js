@@ -1,5 +1,5 @@
 'use strict'
-import { popup, dateTransform, priceTransform,clearHTMLItem } from './common.js';
+import { popup, dateTransform, priceTransform,clearHTMLItem, checkFavoriteCard } from './common.js';
 import { fillHTMLTemplates } from './fill-template-wrap.js';
 
 let popupCloseBtn = popup.querySelector('.popup__close');
@@ -35,7 +35,7 @@ const getPopupElement = (data) => {
       <div class="popup__columns">
         <div class="popup__left">
           <div class="popup__gallery gallery">
-            <button class="gallery__favourite fav-add">
+            <button class="gallery__favourite fav-add ${checkFavoriteCard(data)}">
               <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M3 7C3 13 10 16.5 11 17C12 16.5 19 13 19 7C19 4.79086 17.2091 3 15 3C12 3 11 5 11 5C11 5 10 3 7 3C4.79086 3 3 4.79086 3 7Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
               </svg>

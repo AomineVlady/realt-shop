@@ -141,6 +141,10 @@ export const clearHTMLItem = item => {
     item.innerHTML = "";
 }
 
+export const checkFavoriteCard = (card) => {
+    return card.favorite ? " fav-add--active" : "";
+}
+
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min) + min);
 
 const getUrlPhotos = (arr) => {
