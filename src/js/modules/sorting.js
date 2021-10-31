@@ -1,8 +1,9 @@
 'use strict'
 
-import { cards,sortBtnList } from './common.js';
+import { cards } from './common.js';
 import { renderCards } from './render-cards.js';
 
+const sortBtnList = document.querySelectorAll('.sorting__order-tab input[name=sorting-order]');
 
 sortBtnList.forEach(item => {
   item.addEventListener('change', (evt) => {
@@ -18,6 +19,6 @@ export const sortbyField = (field) => {
     case 'cheap':
       return copyCards.sort((first, second) => first.price - second.price);
     case 'new':
-      return copyCards.sort((first, second) => second.publishDate - first.publishDate);
+      return copyCards.sort((first, second) => second['publish-date'] - first['publish-date']);
   }
 };

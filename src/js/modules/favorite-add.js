@@ -1,5 +1,5 @@
 "use strict"
-import { favoriteProducts, cardsList, getCardContentData, sortBtnList, filterBtn, filterForm, cardsWrapper } from './common.js';
+import { favoriteProducts, cardsList, sortBtnList, filterBtn, filterForm, getCardContentData} from './common.js';
 import { renderCards } from './render-cards.js';
 
 const favoriteListBtn = document.querySelector('#favourites');
@@ -19,7 +19,7 @@ const favAddBtnClassListToggle = btn =>  {
 
 export const onCardListFavoriteClick = (evt) => {
     evt.preventDefault();
-    const card = getCardContentData(cardsList, evt.currentTarget.closest('.results__item').id);
+    const card = getCardContentData(cardsList, parseInt(evt.currentTarget.id.match(/\d+/)).toString());
     !card.favorite ? card.favorite = true : delete card.favorite;
     setfavoriteCardsList(card);
     favAddBtnClassListToggle(evt.currentTarget);

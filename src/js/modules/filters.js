@@ -11,7 +11,7 @@ const getSliderValues = (value) => {
 
 const checkCardPrice = (cardPrice, filterPrice) => cardPrice >= filterPrice[0] && cardPrice <= filterPrice[1];
 
-const checkCardType = (cardType, house, flat, apartments,) => {
+const checkCardType = (cardType, house, flat, apartments) => {
     if (house || flat || apartments) {
         switch (cardType) {
             case "house":
@@ -20,7 +20,7 @@ const checkCardType = (cardType, house, flat, apartments,) => {
             case "flat":
                 return flat
 
-            case "apartments":
+            case "apartment":
                 return apartments
         }
     }
@@ -64,7 +64,7 @@ const filtredCardsList = (evt) => {
     let filteredCardsList = cardsList.filter(card => (
         checkCardPrice(card.price, filteredrData.sampleSlider) &&
         checkCardType(card.filters.type, filteredrData.house, filteredrData.flat, filteredrData.apartments) &&
-        checkCardRooms(card.filters.roomsCount, filteredrData.rooms) &&
+        checkCardRooms(card.filters['rooms-count'], filteredrData.rooms) &&
         card.filters.area >= filteredrData.square)
     );
     getCopyCardsList(filteredCardsList);

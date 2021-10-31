@@ -1,4 +1,6 @@
 
+import './modules/backend.js';
+
 import './modules/common.js';
 import './modules/fill-template-wrap.js';
 import './modules/render-cards.js';
