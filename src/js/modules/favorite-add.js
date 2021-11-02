@@ -1,8 +1,13 @@
 "use strict"
-import { favoriteProducts, cardsList, sortBtnList, filterBtn, filterForm, getCardContentData} from './common.js';
+import { sortBtnList, filterForm, getCardContentData} from './common.js';
 import { renderCards } from './render-cards.js';
 
+localStorage.clear();
+export let favoriteProducts = [];
+localStorage.setItem('favoriteProducts', JSON.stringify(favoriteProducts));
+
 const favoriteListBtn = document.querySelector('#favourites');
+const filterBtn = document.querySelector('.filter__button');
 
 const setfavoriteCardsList = card => {
     !favoriteProducts.includes(card) ?
@@ -19,10 +24,21 @@ const favAddBtnClassListToggle = btn =>  {
 
 export const onCardListFavoriteClick = (evt) => {
     evt.preventDefault();
-    const card = getCardContentData(cardsList, parseInt(evt.currentTarget.id.match(/\d+/)).toString());
-    !card.favorite ? card.favorite = true : delete card.favorite;
+    const card = getCardContentData(cardsList, evt.currentTarget.id);
+    !card.favorite ? card.favorite = true : card.favorite = false;
     setfavoriteCardsList(card);
     favAddBtnClassListToggle(evt.currentTarget);
+
+    favoriteListBtn.addEventListener('change', () => {
+        if (favoriteListBtn.checked) {
+            toggleBlockFields();
+            renderCards(JSON.parse(localStorage.getItem('favoriteProducts')));
+        }
+        else {
+            toggleBlockFields();
+            renderCards(cardsList);
+        }
+    });
 };
 
 const toggleBlockFields = () => {
@@ -38,13 +54,3 @@ const toggleBlockFields = () => {
     });
 };
 
-favoriteListBtn.addEventListener('change', () => {
-    if (favoriteListBtn.checked) {
-        toggleBlockFields();
-        renderCards(JSON.parse(localStorage.getItem('favoriteProducts')));
-    }
-    else {
-        toggleBlockFields();
-        renderCards(cardsList);
-    }
-});

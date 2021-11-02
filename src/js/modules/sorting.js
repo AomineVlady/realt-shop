@@ -1,18 +1,28 @@
 'use strict'
 
-import { cards } from './common.js';
+import { cardsData } from '../main.js';
+import './common.js';
 import { renderCards } from './render-cards.js';
 
 const sortBtnList = document.querySelectorAll('.sorting__order-tab input[name=sorting-order]');
+const debouncTime = 500;
+const debouncing = (func) => {
+  let timeout;
+  return function(){
+    const funcSteps = () => { func.apply(this,arguments) }
+    clearTimeout(timeout);
+    timeout = setTimeout(funcSteps, debouncTime)
+  };
+}
 
 sortBtnList.forEach(item => {
-  item.addEventListener('change', (evt) => {
+  item.addEventListener('change', debouncing((evt) => {
     renderCards(sortbyField(evt.target.value));
-  });
+  }));
 })
 
 export const sortbyField = (field) => {
-  const copyCards = cards.slice();
+  const copyCards = cardsData.slice();
   switch (field) {
     case 'popular':
       return copyCards;
@@ -22,3 +32,4 @@ export const sortbyField = (field) => {
       return copyCards.sort((first, second) => second['publish-date'] - first['publish-date']);
   }
 };
+

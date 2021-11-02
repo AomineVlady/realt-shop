@@ -1,79 +1,11 @@
 "use strict"
 
 import './rSlider.min.js';
-import {getResponse} from './backend.js'
-import { renderCards } from './render-cards.js';
 
 export const COUNT_CARDS = 7;
-const COUNT_PHOTOS_MAX = 4;
-const COUNT_PHOTOS_MIN = 1;
-// const COUNT_ROOMS = 7;
-// const MIN_COUNT_AREA = 30;
-// const MAX_COUNT_AREA = 250;
-// const BUILDING_MAX = 40;
-// const BUILDING_MIN = 1;
-// const RATING_MAX = 5;
 const PRICE_MIN = 2000000;
 const PRICE_MAX = 50000000;
-// const PRODUCT_CATEGORY = "Недвижимость";
-// const MAX_DAYS_MILLISECONDS = 432000000;
 
-const nameList = [
-    'Двушка в центре Питера',
-    'Однушка в спальнике Питера',
-    'Трешка рядом с Кремлём',
-    'Студия для аскетов',
-    'Апартаменты для фрилансера'
-];
-
-const descriptionList = [
-    'Студия с лаконичным дизайном возле Ангары.',
-    'Трёхкомнатная квартира для большой семьи рядом с Кремлём.',
-    '2 минуты до набережной и прекрасного вида на Волгу.',
-    'В квартире есть сауна, джакузи и домашний кинотеатр. Перепланировка согласована.',
-    'Уютная однушка в тихом спальном районе. Рядом лес и озёра.'
-];
-
-const sellerNameList = [
-    'Бюро Семёна',
-    'Игнат-Агент',
-    'Виталий Петрович',
-    'Марья Андреевна'
-];
-
-const cityList = [
-    'Иркутск',
-    'Москва',
-    'Красноярск',
-    'Минск',
-];
-
-const streetList = [
-    'ул. Шахтеров',
-    'ул. Полярная',
-    'ул. Лиственная',
-    'ул. Мира',
-    'ул. Советская'
-];
-
-const filtersTypeList = [
-    'house',
-    'flat',
-    'apartments'
-];
-
-const photosUrlList = [
-    "img/apt_1.png",
-    "img/apt_2.png",
-    "img/apt_3.png",
-    "img/apt_4.png",
-    "img/apt_5.png",
-    "img/apt_6.png",
-    "img/house_1.png",
-    "img/house_2.png",
-    "img/house_3.png",
-    "img/house_4.png"
-];
 
 const getSliderValues = () => {
     const pricesValues = [];
@@ -129,15 +61,43 @@ export const priceTransform = (arg) => {
     return argString.join('');
 };
 
+export const adapter = (cards) => {
+    const cardsList = []
+    for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        cardsList.push({
+            id: `card_${i}`,
+            favorite: false,
+            name: card.name,
+            description: card.description,
+            price: card.price,
+            category: card.category,
+            coordinates: card.coordinates,
+            seller: {
+                fullname: card.seller.fullname,
+                rating: card.seller.rating,
+            },
+            publishDate: +card['publish-date'],
+            address: {
+                city: card.address.city,
+                street: card.address.street,
+                building: card.address.building,
+            },
+            photos: card.photos,
+            filters: {
+                type: card.filters.type,
+                area: card.filters.area,
+                roomsCount: card.filters['rooms-count'],
+            },
+        })
+    }
+    return cardsList;
+}
 
-export const filterBtn = document.querySelector('.filter__button');
+
 export const filterForm = document.querySelector('.filter__form');
 
 export const cardsWrapper = document.querySelector('.results__list');
-
-localStorage.clear();
-export const favoriteProducts = [];
-localStorage.setItem('favoriteProducts', JSON.stringify(favoriteProducts));
 
 export const clearHTMLItem = item => {
     item.innerHTML = "";
@@ -149,18 +109,6 @@ export const checkFavoriteCard = (card) => {
 
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min) + min);
 
-const getUrlPhotos = (arr) => {
-    const urls = [];
-    const count = getRandomInt(COUNT_PHOTOS_MIN, COUNT_PHOTOS_MAX);
-    while (urls.length !== count) {
-        const rndElem = arr[getRandomInt(0, arr.length)];
-        if (!urls.includes(rndElem)) {
-            urls.push(rndElem);
-        };
-    };
-
-    return urls;
-};
 
 // const setListCards = () => {
 //     const list = [];
@@ -193,28 +141,25 @@ const getUrlPhotos = (arr) => {
 //     return list;
 // };
 
-const inintCardsId = (cardsList) =>{
-    cardsList.forEach((card,index) => {
-        card.id = index
-    });
-}
 
-export const getCardContentData = (list, id) => list.find(item => item.id === +id);
+
+export const getCardContentData = (list, id) => list.find(item => item.id === id);
 
 export const sortBtnList = document.querySelectorAll('.sorting__order-tab input[name=sorting-order]');
 
-export let cardsList = []
-const initCards = async () => {
-    cardsList = await getResponse()
-    inintCardsId(cardsList);
-    cards = cardsList.slice();
-    renderCards(cards);
-  }
+// export let cardsList = []
 
-initCards()
+// const initCards = async () => {
+//     cardsList = await getResponse()
+//     inintCardsId(cardsList);
+//     cards = cardsList.slice(0,COUNT_CARDS);
+//     renderCards(cards);
+// }
 
-export let cards = cardsList.slice();
+// initCards()
+
+// export let cards = cardsList.slice();
 
 export const getCopyCardsList = arrCards => {
-    cards = arrCards.slice(); 
+    cards = arrCards.slice();
 }

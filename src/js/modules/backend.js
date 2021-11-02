@@ -1,15 +1,10 @@
-'use strict'
-const SERVER_URL = 'https://morfey216.github.io/online-store-bd/bd.json';
+"use strict"
 
-const onError = errorMessage => errorMessage;
+const SERVER_URL =  "https://morfey216.github.io/online-store-bd/bd.json";
 
-const onLoad = dataServer => dataServer.products;
-
-export const getResponse = async () => {
-    return await fetch(SERVER_URL)
-      .then(response => response.json())
-      .then(data => {
-        return onLoad(data)
-      })
+export const getResponse = (onLoad, onError) => {
+    fetch(SERVER_URL)
+      .then(respons => respons.json())
+      .then(data => { onLoad(data) })
       .catch(err => onError(err))
-  }
+};

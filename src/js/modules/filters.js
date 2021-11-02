@@ -1,7 +1,7 @@
 'use strict'
 
 import { renderCards } from './render-cards.js'
-import { cardsList, cards, getCopyCardsList } from './common.js'
+import { getCopyCardsList } from './common.js'
 
 const form = document.forms[0];
 
