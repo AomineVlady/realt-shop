@@ -1,9 +1,10 @@
 'use strict'
 
 import { renderCards } from './render-cards.js'
-import { getCopyCardsList } from './common.js'
 
-const form = document.forms[0];
+const form = document.querySelector('.filter__form');
+let filterData = [];
+export let filterDataCopy = [];
 
 const getSliderValues = (value) => {
     return value.split(',').map(item => +item);
@@ -61,15 +62,24 @@ const filtredCardsList = (evt) => {
     evt.preventDefault();
     const filteredrData = getFiltersData();
     document.querySelector('#sort-popular').checked = true;
-    let filteredCardsList = cardsList.filter(card => (
+    const filteredData = filterData.filter(card => (
         checkCardPrice(card.price, filteredrData.sampleSlider) &&
         checkCardType(card.filters.type, filteredrData.house, filteredrData.flat, filteredrData.apartments) &&
-        checkCardRooms(card.filters['rooms-count'], filteredrData.rooms) &&
+        checkCardRooms(card.filters.roomsCount, filteredrData.rooms) &&
         card.filters.area >= filteredrData.square)
     );
-    getCopyCardsList(filteredCardsList);
-    renderCards(cards);
+    filterDataCopy = filteredData;
+    renderCards(filteredData);
 };
 
-form.addEventListener('submit', filtredCardsList);
 
+
+const initListener = () => {
+    form.addEventListener('submit', filtredCardsList);
+};
+     
+export const initFilters = (cardsData) => {
+    filterData = cardsData;
+    filterDataCopy = filterData.slice();
+    initListener();
+};

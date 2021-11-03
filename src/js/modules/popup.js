@@ -23,10 +23,7 @@ const checkEmptyContent = (content, data) => {
   return (data == null || data == "" || data == 0) ? "" : content;
 }
 
-let activePopupCard = {};
-
 const getPopupElement = (data) => {
-  activePopupCard = data
   return `
     <div class = "popup__inner">
       <button class="popup__close" type="button" aria-label="Закрыть">
@@ -62,8 +59,8 @@ const getPopupElement = (data) => {
             </li>`, data.filters.area)}
             ${checkEmptyContent(`<li class="chars__item">
               <div class="chars__name">Количество комнат</div>
-              <div class="chars__value">${data.filters['rooms-count']}</div>
-            </li>`, data.filters['rooms-count'])}
+              <div class="chars__value">${data.filters.roomsCount}</div>
+            </li>`, data.filters.roomsCount)}
             ${checkEmptyContent(`<li class="chars__item">
               <div class="chars__name">Тип недвижимости</div>
               <div class="chars__value">${data.filters.type}</div>
@@ -89,6 +86,7 @@ const getPopupElement = (data) => {
         </div>
       </div>
     </div>`;
+    
 }
 
 const setActivePicture = (picture) => {
@@ -146,7 +144,7 @@ const initPopupEventListener = () => {
   popupCloseBtn.addEventListener('click', popupBtnCloseClick);
   document.addEventListener('keydown', popupPressEsc);
   popup.addEventListener('click', overlayPopupClick);
-  popupFavoriteBtn.addEventListener('click', onCardListFavoriteClick)
+  popupFavoriteBtn.addEventListener('click', onCardListFavoriteClick);
 }
 
 const removePopupEventListener = () => {
@@ -156,5 +154,5 @@ const removePopupEventListener = () => {
   popupCloseBtn.removeEventListener('click', popupBtnCloseClick);
   document.removeEventListener('keydown', popupPressEsc);
   popup.removeEventListener('click', overlayPopupClick);
-  popupFavoriteBtn.removeEventListener('click', onCardListFavoriteClick)
+  popupFavoriteBtn.removeEventListener('click', onCardListFavoriteClick);
 }

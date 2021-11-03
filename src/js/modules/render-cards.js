@@ -1,15 +1,15 @@
 'use strict'
 
-import { cardsWrapper, priceTransform, dateTransform, clearHTMLItem, getCardContentData, checkFavoriteCard} from './common.js'
+import { priceTransform, dateTransform, clearHTMLItem, getCardContentData, checkFavoriteCard} from './common.js'
 import { fillHTMLTemplates } from './fill-template-wrap.js'
 import { onCardListFavoriteClick } from './favorite-add.js'
 import { openPopup } from './popup.js'
 
-
-const sortBtnList = document.querySelectorAll('.sorting__order-tab input[name=sorting-order]');
+const cardsWrapper = document.querySelector('.results__list');
+let cardsList = [];
 
 const getCardsElements = (card) => {
-  return `<li class="results__item product" id = "${card.id}">
+  return `<li class="results__item product" data-id = "${card.id}">
         <button class="product__favourite fav-add ${checkFavoriteCard(card)}" type="button" aria-label="Добавить в избранное">
           <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" clip-rule="evenodd" d="M3 7C3 13 10 16.5 11 17C12 16.5 19 13 19 7C19 4.79086 17.2091 3 15 3C12 3 11 5 11 5C11 5 10 3 7 3C4.79086 3 3 4.79086 3 7Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
@@ -30,38 +30,33 @@ const getCardsElements = (card) => {
       </li>`;
 };
 
-
-
-export const renderCards = (cardList) => {
+export const renderCards = (cardsData) => {
+  cardsList = cardsData;
   clearHTMLItem(cardsWrapper);
-  for (const card of cardList) {
+  removeEventListenerCards(cardsWrapper.querySelectorAll('.results__item'));
+  for (const card of cardsData) {
     fillHTMLTemplates(cardsWrapper, getCardsElements(card));
   }
-  
-  const onCardClick = (evt) => {
-    evt.preventDefault();
-    if (evt.target === evt.currentTarget.querySelector('img') || evt.target === evt.currentTarget.querySelector('a')) {
-      openPopup(getCardContentData(cardList, evt.currentTarget.id));
-    }
-  }
-  
-  const removeEventListenerCards = (cardsItems) => {
-    cardsItems.forEach(card => {
-      card.removeEventListener('click', onCardClick);
-      card.querySelector('button.fav-add').removeEventListener('click', () => onCardListFavoriteClick(event,cardList));
-    });
-  }
-  
-  removeEventListenerCards(cardsWrapper.querySelectorAll('.results__item'));
-
-  const addEventListenerCards = (cardsItems) => {
-    cardsItems.forEach(card => {
-      card.addEventListener('click', onCardClick);
-      card.querySelector('button.fav-add').addEventListener('click', () => onCardListFavoriteClick(event,cardList));
-    });
-  }
-
-  
-  
   addEventListenerCards(cardsWrapper.querySelectorAll('.results__item'));
+}
+
+const onCardClick = (evt) => {
+  evt.preventDefault();
+  if (evt.target === evt.currentTarget.querySelector('img') || evt.target === evt.currentTarget.querySelector('a')) {
+    openPopup(getCardContentData(cardsList, evt.currentTarget.getAttribute('data-id')));
+  }
+}
+
+const removeEventListenerCards = (cardsItems) => {
+  cardsItems.forEach(card => {
+    card.removeEventListener('click', onCardClick);
+    card.querySelector('button.fav-add').removeEventListener('click',  onCardListFavoriteClick);
+  });
+}
+
+const addEventListenerCards = (cardsItems) => {
+  cardsItems.forEach(card => {
+    card.addEventListener('click', onCardClick);
+    card.querySelector('button.fav-add').addEventListener('click', onCardListFavoriteClick);
+  });
 }
