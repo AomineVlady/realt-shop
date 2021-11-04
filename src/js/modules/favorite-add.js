@@ -1,5 +1,5 @@
 "use strict"
-import { getCardContentData} from './common.js';
+import { getCardContentData } from './common.js';
 import { renderCards } from './render-cards.js';
 
 const favoriteListBtn = document.querySelector('#favourites');
@@ -14,21 +14,20 @@ localStorage.setItem('favoriteProducts', JSON.stringify(favoriteProducts));
 
 const setfavoriteCardsList = card => {
     !favoriteProducts.includes(card) ?
-     favoriteProducts.push(card) :
-      favoriteProducts.splice(favoriteProducts.indexOf(card), 1);
+        favoriteProducts.push(card) :
+        favoriteProducts.splice(favoriteProducts.indexOf(card), 1);
     localStorage.setItem('favoriteProducts', JSON.stringify(favoriteProducts));
 };
 
-const favAddBtnClassListToggle = btn =>  {
+const favAddBtnClassListToggle = btn => {
     !btn.classList.contains('fav-add--active') ?
-     btn.classList.add('fav-add--active') :
-      btn.classList.remove('fav-add--active');
+        btn.classList.add('fav-add--active') :
+        btn.classList.remove('fav-add--active');
 }
 
 export const onCardListFavoriteClick = (evt) => {
     evt.preventDefault();
-    const card = getCardContentData(cardsList, evt.currentTarget.closest('.product').getAttribute('data-id'));
-    // need fixed. Here have a err.
+    const card = getCardContentData(cardsList, evt.currentTarget.closest('.js-data-wrap').getAttribute('data-id'));
     !card.favorite ? card.favorite = true : card.favorite = false;
     setfavoriteCardsList(card);
     favAddBtnClassListToggle(evt.currentTarget);
@@ -36,14 +35,14 @@ export const onCardListFavoriteClick = (evt) => {
 
 const toggleBlockFields = () => {
     filterBtn.hasAttribute('disabled') ? filterBtn.removeAttribute('disabled') :
-     filterBtn.setAttribute('disabled', 'disabled');
+        filterBtn.setAttribute('disabled', 'disabled');
     filterForm.querySelectorAll('input').forEach(item => {
         item.hasAttribute('disabled') ? item.removeAttribute('disabled') :
-         item.setAttribute('disabled', 'disabled');
+            item.setAttribute('disabled', 'disabled');
     });
     sortBtnList.forEach(item => {
         item.hasAttribute('disabled') ? item.removeAttribute('disabled') :
-         item.setAttribute('disabled', 'disabled');
+            item.setAttribute('disabled', 'disabled');
     });
 };
 
@@ -58,9 +57,9 @@ const initListener = () => {
             toggleBlockFields();
             renderCards(cardsList);
         }
-    });   
+    });
 };
-     
+
 export const initFavorite = (cardsData) => {
     cardsList = cardsData;
     initListener();

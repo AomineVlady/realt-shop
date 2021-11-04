@@ -77,7 +77,7 @@ const filtredCardsList = (evt) => {
 const initListener = () => {
     form.addEventListener('submit', filtredCardsList);
 };
-     
+
 export const initFilters = (cardsData) => {
     filterData = cardsData;
     filterDataCopy = filterData.slice();

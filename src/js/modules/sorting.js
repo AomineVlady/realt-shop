@@ -8,8 +8,8 @@ const debouncTime = 500;
 
 const debouncing = (func) => {
   let timeout;
-  return function(){
-    const funcSteps = () => { func.apply(this,arguments) }
+  return function () {
+    const funcSteps = () => { func.apply(this, arguments) }
     clearTimeout(timeout);
     timeout = setTimeout(funcSteps, debouncTime)
   };
@@ -22,7 +22,7 @@ export const sortingBtnAddEventListeners = () => {
     item.addEventListener('change', debouncing((evt) => {
       renderCards(sortbyField(evt.target.value));
     }));
-  })  
+  })
 }
 
 const sortbyField = (field) => {

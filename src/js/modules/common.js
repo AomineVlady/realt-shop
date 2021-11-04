@@ -103,7 +103,3 @@ export const checkFavoriteCard = (card) => {
 }
 
 export const getCardContentData = (list, id) => list.find(item => item.id === id);
-
-export const getCopyCardsList = arrCards => {
-    cards = arrCards.slice();
-}

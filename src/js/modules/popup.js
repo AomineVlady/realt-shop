@@ -1,13 +1,14 @@
 'use strict'
-import { dateTransform, priceTransform,clearHTMLItem, checkFavoriteCard } from './common.js';
-import {onCardListFavoriteClick} from './favorite-add.js';
-import { fillHTMLTemplates } from './fill-template-wrap.js';
+import { dateTransform, priceTransform, clearHTMLItem, checkFavoriteCard } from './common.js';
+import { onCardListFavoriteClick } from './favorite-add.js';
 import { renderCards } from './render-cards.js';
+import { initMap } from './map.js';
 
 const popup = document.querySelector('.popup');
 let popupCloseBtn = popup.querySelector('.popup__close');
 let popupFavoriteBtn = popup.querySelector('button.fav-add');
 let galleryList = popup.querySelectorAll('.gallery__item');
+let cardsList = [];
 
 const getPhotoList = (list, name) => {
   let result = '';
@@ -37,7 +38,7 @@ const getPopupElement = (data) => {
       <div class="popup__price">${priceTransform(data.price)} ₽</div>
       <div class="popup__columns">
         <div class="popup__left">
-          <div class="popup__gallery gallery">
+          <div class="popup__gallery gallery js-data-wrap" data-id = "${data.id}">
             <button class="gallery__favourite fav-add ${checkFavoriteCard(data)}">
               <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M3 7C3 13 10 16.5 11 17C12 16.5 19 13 19 7C19 4.79086 17.2091 3 15 3C12 3 11 5 11 5C11 5 10 3 7 3C4.79086 3 3 4.79086 3 7Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
@@ -81,13 +82,13 @@ const getPopupElement = (data) => {
         </div>
         <div class="popup__right">
           <div class="popup__map">
-            <img src="img/map.jpg" width="268" height="180" alt="Москва, Нахимовский проспект, дом 5">
+            <div class='map' id='map'></div>
           </div>
           <div class="popup__address">${data.address.city}, ${data.address.street}, дом ${data.address.building}</div>
         </div>
       </div>
     </div>`;
-    
+
 }
 
 const setActivePicture = (picture) => {
@@ -105,9 +106,9 @@ const swapMainPhoto = (evt) => {
 }
 
 export const openPopup = (cardData) => {
-
   clearHTMLItem(popup);
-  fillHTMLTemplates(popup, getPopupElement(cardData));
+  popup.insertAdjacentHTML('afterBegin', getPopupElement(cardData));
+  initMap(cardData.coordinates[0], cardData.coordinates[1])
   popup.classList.add('popup--active');
   popupFavoriteBtn = popup.querySelector('button.fav-add');
   popupCloseBtn = popup.querySelector('.popup__close');
@@ -117,6 +118,7 @@ export const openPopup = (cardData) => {
 
 const closePopup = () => {
   popup.classList.remove('popup--active');
+  renderCards(cardsList);
   removePopupEventListener();
 }
 
@@ -157,4 +159,8 @@ const removePopupEventListener = () => {
   document.removeEventListener('keydown', popupPressEsc);
   popup.removeEventListener('click', overlayPopupClick);
   popupFavoriteBtn.removeEventListener('click', onCardListFavoriteClick);
+}
+
+export const initPopup = cardsData => {
+  cardsList = cardsData;
 }
