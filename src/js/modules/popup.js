@@ -2,6 +2,7 @@
 import { dateTransform, priceTransform,clearHTMLItem, checkFavoriteCard } from './common.js';
 import {onCardListFavoriteClick} from './favorite-add.js';
 import { fillHTMLTemplates } from './fill-template-wrap.js';
+import { renderCards } from './render-cards.js';
 
 const popup = document.querySelector('.popup');
 let popupCloseBtn = popup.querySelector('.popup__close');
@@ -104,6 +105,7 @@ const swapMainPhoto = (evt) => {
 }
 
 export const openPopup = (cardData) => {
+
   clearHTMLItem(popup);
   fillHTMLTemplates(popup, getPopupElement(cardData));
   popup.classList.add('popup--active');

@@ -12,7 +12,6 @@ import {initFilters} from './modules/filters.js';
 const COUNT_CARDS = 7;
 let cardsData = [];
 
-
 const onError = (errorMessage) => {
     console.log(errorMessage);
 };

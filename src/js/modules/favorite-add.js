@@ -8,14 +8,15 @@ const sortBtnList = document.querySelectorAll('.sorting__order-tab input[name=so
 const filterBtn = document.querySelector('.filter__button');
 
 localStorage.clear();
-let favoriteProducts = [];
+let cardsList = []
+let favoriteProducts = []; //fors localStorage
 localStorage.setItem('favoriteProducts', JSON.stringify(favoriteProducts));
 
 const setfavoriteCardsList = card => {
     !favoriteProducts.includes(card) ?
      favoriteProducts.push(card) :
       favoriteProducts.splice(favoriteProducts.indexOf(card), 1);
-      localStorage.setItem('favoriteProducts', JSON.stringify(favoriteProducts));
+    localStorage.setItem('favoriteProducts', JSON.stringify(favoriteProducts));
 };
 
 const favAddBtnClassListToggle = btn =>  {
@@ -26,7 +27,7 @@ const favAddBtnClassListToggle = btn =>  {
 
 export const onCardListFavoriteClick = (evt) => {
     evt.preventDefault();
-    const card = getCardContentData(favoriteProducts, evt.currentTarget.getAttribute('data-id'));
+    const card = getCardContentData(cardsList, evt.currentTarget.closest('.product').getAttribute('data-id'));
     // need fixed. Here have a err.
     !card.favorite ? card.favorite = true : card.favorite = false;
     setfavoriteCardsList(card);
@@ -48,18 +49,19 @@ const toggleBlockFields = () => {
 
 const initListener = () => {
     favoriteListBtn.addEventListener('change', () => {
-        if (favoriteListBtn.checked) {
+        const favoriteCards = JSON.parse(localStorage.getItem('favoriteProducts'));
+        if (favoriteListBtn.checked && favoriteCards.length != 0) {
             toggleBlockFields();
-            renderCards(JSON.parse(localStorage.getItem('favoriteProducts')));
+            renderCards(favoriteCards);
         }
         else {
             toggleBlockFields();
-            renderCards(favoriteProducts);
+            renderCards(cardsList);
         }
     });   
 };
      
 export const initFavorite = (cardsData) => {
-    favoriteProducts = cardsData;
+    cardsList = cardsData;
     initListener();
 };
