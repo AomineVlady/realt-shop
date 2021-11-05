@@ -5,6 +5,7 @@ import './rSlider.min.js';
 const PRICE_MIN = 2000000;
 const PRICE_MAX = 50000000;
 const SLIDER_STEP = 1000;
+const DEMOUNCE_TIME = 500;
 
 const setSliderValues = () => {
     const pricesValues = [];
@@ -12,7 +13,7 @@ const setSliderValues = () => {
         pricesValues.push(i);
     }
     return pricesValues;
-}
+};
 
 const mySlider = new rSlider({
     target: '#sampleSlider',
@@ -49,7 +50,7 @@ export const dateTransform = (arg) => {
 
         return `${resultDate.getDate()} ${monthsList[resultDate.getUTCMonth()]} ${resultDate.getFullYear()}`
     }
-}
+};
 
 export const priceTransform = (arg) => {
     const argString = arg.toString().split('');
@@ -92,7 +93,7 @@ export const adapter = (cards) => {
         })
     }
     return cardsList;
-}
+};
 
 export const clearHTMLItem = item => {
     item.innerHTML = "";
@@ -103,3 +104,12 @@ export const checkFavoriteCard = (card) => {
 }
 
 export const getCardContentData = (list, id) => list.find(item => item.id === id);
+
+export const debouncing = (func) => {
+  let timeout;
+  return function () {
+    const funcSteps = () => { func.apply(this, arguments) }
+    clearTimeout(timeout);
+    timeout = setTimeout(funcSteps, DEMOUNCE_TIME);
+  };
+};

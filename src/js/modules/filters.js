@@ -60,18 +60,17 @@ const getFiltersData = () => {
 
 const filtredCardsList = (evt) => {
     evt.preventDefault();
-    const filteredrData = getFiltersData();
+    const filteredFormData = getFiltersData();
     document.querySelector('#sort-popular').checked = true;
     const filteredData = filterData.filter(card => (
-        checkCardPrice(card.price, filteredrData.sampleSlider) &&
-        checkCardType(card.filters.type, filteredrData.house, filteredrData.flat, filteredrData.apartments) &&
-        checkCardRooms(card.filters.roomsCount, filteredrData.rooms) &&
-        card.filters.area >= filteredrData.square)
+        checkCardPrice(card.price, filteredFormData.sampleSlider) &&
+        checkCardType(card.filters.type, filteredFormData.house, filteredFormData.flat, filteredFormData.apartments) &&
+        checkCardRooms(card.filters.roomsCount, filteredFormData.rooms) &&
+        card.filters.area >= filteredFormData.square)
     );
     filterDataCopy = filteredData;
     renderCards(filteredData);
 };
-
 
 
 const initListener = () => {

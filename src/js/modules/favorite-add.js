@@ -1,15 +1,18 @@
 "use strict"
-import { getCardContentData } from './common.js';
+import { clearHTMLItem, getCardContentData } from './common.js';
 import { renderCards } from './render-cards.js';
+import { sortedDataCopy } from './sorting.js';
+import { filterDataCopy } from './filters.js';
 
 const favoriteListBtn = document.querySelector('#favourites');
 const filterForm = document.querySelector('.filter__form');
 const sortBtnList = document.querySelectorAll('.sorting__order-tab input[name=sorting-order]');
 const filterBtn = document.querySelector('.filter__button');
+const cardsWrapper = document.querySelector('.results__list');
 
 localStorage.clear();
 let cardsList = []
-let favoriteProducts = []; //fors localStorage
+let favoriteProducts = [];
 localStorage.setItem('favoriteProducts', JSON.stringify(favoriteProducts));
 
 const setfavoriteCardsList = card => {
@@ -49,13 +52,19 @@ const toggleBlockFields = () => {
 const initListener = () => {
     favoriteListBtn.addEventListener('change', () => {
         const favoriteCards = JSON.parse(localStorage.getItem('favoriteProducts'));
-        if (favoriteListBtn.checked && favoriteCards.length != 0) {
+        if (favoriteListBtn.checked) {
             toggleBlockFields();
-            renderCards(favoriteCards);
+            if (favoriteCards.length === 0) {
+                clearHTMLItem(cardsWrapper);
+                cardsWrapper.insertAdjacentHTML('beforeend',
+                    `<p style='padding:20px; text-align:center;'>«У вас пока нет избранных товаров. Чтобы отметить товар, кликните на сердечко в карточке объявления. Вы можете вернуться к списку всех товаров, кликнув ещё раз на «Показать избранные»».</p>`
+                );
+            }
+            else renderCards(favoriteCards);
         }
         else {
             toggleBlockFields();
-            renderCards(cardsList);
+            sortedDataCopy.length != 0 ? renderCards(sortedDataCopy) : renderCards(filterDataCopy);
         }
     });
 };

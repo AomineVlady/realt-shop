@@ -1,14 +1,28 @@
 'use strict'
 import { dateTransform, priceTransform, clearHTMLItem, checkFavoriteCard } from './common.js';
 import { onCardListFavoriteClick } from './favorite-add.js';
-import { renderCards } from './render-cards.js';
 import { initMap } from './map.js';
 
 const popup = document.querySelector('.popup');
 let popupCloseBtn = popup.querySelector('.popup__close');
 let popupFavoriteBtn = popup.querySelector('button.fav-add');
 let galleryList = popup.querySelectorAll('.gallery__item');
-let cardsList = [];
+
+const synhCardAndModal = (id) => {
+  let like;
+  document.querySelectorAll('.results__item').forEach(element => {
+    if (element.getAttribute('data-id') === id) {
+      like = element.querySelector(".product__favourite");
+    }
+  });
+
+  like.classList.contains("fav-add--active") ? like.classList.remove("fav-add--active") : like.classList.add("fav-add--active");
+};
+
+const onPopupFavAddClick = (evt) => {
+  onCardListFavoriteClick(evt);
+  synhCardAndModal(evt.currentTarget.closest('.js-data-wrap').getAttribute('data-id'))
+};
 
 const getPhotoList = (list, name) => {
   let result = '';
@@ -68,7 +82,7 @@ const getPopupElement = (data) => {
               <div class="chars__value">${data.filters.type}</div>
             </li>`, data.filters.type)}
           </ul>
-          <div class="popup__seller seller seller--good">
+          <div class="popup__seller seller ${data.seller.rating > 4 ? "seller--good" : "seller--bad"}">
             <h3>Продавец</h3>
             <div class="seller__inner">
               <a class="seller__name" href="#">${data.seller.fullname}</a>
@@ -118,7 +132,6 @@ export const openPopup = (cardData) => {
 
 const closePopup = () => {
   popup.classList.remove('popup--active');
-  renderCards(cardsList);
   removePopupEventListener();
 }
 
@@ -148,7 +161,7 @@ const initPopupEventListener = () => {
   popupCloseBtn.addEventListener('click', popupBtnCloseClick);
   document.addEventListener('keydown', popupPressEsc);
   popup.addEventListener('click', overlayPopupClick);
-  popupFavoriteBtn.addEventListener('click', onCardListFavoriteClick);
+  popupFavoriteBtn.addEventListener('click', onPopupFavAddClick);
 }
 
 const removePopupEventListener = () => {
@@ -158,9 +171,5 @@ const removePopupEventListener = () => {
   popupCloseBtn.removeEventListener('click', popupBtnCloseClick);
   document.removeEventListener('keydown', popupPressEsc);
   popup.removeEventListener('click', overlayPopupClick);
-  popupFavoriteBtn.removeEventListener('click', onCardListFavoriteClick);
-}
-
-export const initPopup = cardsData => {
-  cardsList = cardsData;
+  popupFavoriteBtn.removeEventListener('click', onPopupFavAddClick);
 }
