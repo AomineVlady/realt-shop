@@ -64,7 +64,7 @@ const initListener = () => {
         }
         else {
             toggleBlockFields();
-            sortedDataCopy.length != 0 ? renderCards(sortedDataCopy) : renderCards(filterDataCopy);
+            sortedDataCopy.length != 0 && filterDataCopy.length === 0 ? renderCards(sortedDataCopy) : renderCards(filterDataCopy);
         }
     });
 };
